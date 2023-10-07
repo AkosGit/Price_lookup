@@ -50,6 +50,13 @@ android {
 }
 
 dependencies {
+    implementation ("org.jetbrains.kotlinx:multik-core:0.2.2")
+    implementation ("org.jetbrains.kotlinx:multik-kotlin:0.2.2")
+    implementation ("com.google.mlkit:text-recognition:16.0.0")
+    implementation ("com.google.mlkit:image-labeling-custom:17.0.1")
+    implementation ("com.github.kittinunf.fuel:fuel:3.0.0-alpha1")
+    implementation ("com.github.kittinunf.fuel:fuel-gson:2.3.1")
+    implementation ("androidx.navigation:navigation-compose:2.7.1")
 
     implementation("androidx.core:core-ktx:1.9.0")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.6.2")
