@@ -1,6 +1,7 @@
 package com.uni.project.pricelookup.components
 
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
@@ -16,19 +17,21 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.uni.project.pricelookup.R
 
 @Preview
 @Composable
 fun ProductPreviewCard() {
     ElevatedCard(
         elevation = CardDefaults.cardElevation(
-            defaultElevation = 6.dp
+            defaultElevation = 30.dp
         ),
-        modifier = Modifier.size(width = 240.dp, height = 100.dp)
+        modifier = Modifier.size(width = 150.dp, height = 100.dp)
     ) {
         Text(
             text = "This will be a pic of a chocolate",
