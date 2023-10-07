@@ -18,6 +18,7 @@ import com.uni.project.pricelookup.ui.theme.PriceLookupTheme
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         // szia Ákos! :)
+        // hello there!
         super.onCreate(savedInstanceState)
         setContent {
             PriceLookupTheme {
