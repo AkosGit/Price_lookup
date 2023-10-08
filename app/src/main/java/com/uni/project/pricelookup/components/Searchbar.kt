@@ -48,6 +48,7 @@ fun SearchWidget(
         //elevation = AppBarDefaults.TopAppBarElevation,
         color = MaterialTheme.colorScheme.background
     ) {
+
         TextField(
 
             modifier = Modifier

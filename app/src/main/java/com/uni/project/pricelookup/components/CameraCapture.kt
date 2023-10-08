@@ -30,7 +30,13 @@ import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.coroutineScope
+import androidx.lifecycle.lifecycleScope
 import com.uni.project.pricelookup.PreferencesManager
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.launch
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
@@ -44,6 +50,7 @@ fun CameraCapture(
     onImageCaptured: (Uri) -> Unit,
     onError: (ImageCaptureException) -> Unit
 ) {
+
     val context = LocalContext.current
     val preferencesManager = remember { PreferencesManager(context) }
     val outputDirectoryPath=preferencesManager.getData("outputDir","")
@@ -63,6 +70,38 @@ fun CameraCapture(
         .build()
 
     // 2
+    fun takePhoto(
+        filenameFormat: String,
+        imageCapture: ImageCapture,
+        outputDirectory: File,
+        executor: Executor,
+        onImageCaptured: (Uri) -> Unit,
+        onError: (ImageCaptureException) -> Unit
+    ) {
+
+        val photoFile = File(
+            outputDirectory,
+            SimpleDateFormat(filenameFormat, Locale.US).format(System.currentTimeMillis()) + ".jpg"
+        )
+
+        val outputOptions = ImageCapture.OutputFileOptions.Builder(photoFile).build()
+
+        imageCapture.takePicture(outputOptions, executor, object: ImageCapture.OnImageSavedCallback {
+            override fun onError(exception: ImageCaptureException) {
+                Log.e("kilo", "Take photo error:", exception)
+                onError(exception)
+            }
+
+            override fun onImageSaved(outputFileResults: ImageCapture.OutputFileResults) {
+                val savedUri = Uri.fromFile(photoFile)
+                CoroutineScope(Dispatchers.Main).launch {
+                    onImageCaptured(savedUri)
+                }
+                lifecycleOwner.lifecycleScope.coroutineContext.cancel()
+                cameraExecutor.shutdownNow()
+            }
+        })
+    }
     LaunchedEffect(lensFacing) {
         val cameraProvider = context.getCameraProvider()
         cameraProvider.unbindAll()
@@ -76,6 +115,7 @@ fun CameraCapture(
         preview.setSurfaceProvider(previewView.surfaceProvider)
     }
 
+    //lifecycleOwner.lifecycle.coroutineScope.coroutineContext.cancel()
     // 3
     Box(contentAlignment = Alignment.BottomCenter, modifier = Modifier.fillMaxSize()) {
         AndroidView({ previewView }, modifier = Modifier.fillMaxSize())
@@ -108,34 +148,7 @@ fun CameraCapture(
     }
 }
 
-private fun takePhoto(
-    filenameFormat: String,
-    imageCapture: ImageCapture,
-    outputDirectory: File,
-    executor: Executor,
-    onImageCaptured: (Uri) -> Unit,
-    onError: (ImageCaptureException) -> Unit
-) {
 
-    val photoFile = File(
-        outputDirectory,
-        SimpleDateFormat(filenameFormat, Locale.US).format(System.currentTimeMillis()) + ".jpg"
-    )
-
-    val outputOptions = ImageCapture.OutputFileOptions.Builder(photoFile).build()
-
-    imageCapture.takePicture(outputOptions, executor, object: ImageCapture.OnImageSavedCallback {
-        override fun onError(exception: ImageCaptureException) {
-            Log.e("kilo", "Take photo error:", exception)
-            onError(exception)
-        }
-
-        override fun onImageSaved(outputFileResults: ImageCapture.OutputFileResults) {
-            val savedUri = Uri.fromFile(photoFile)
-            onImageCaptured(savedUri)
-        }
-    })
-}
 
 private suspend fun Context.getCameraProvider(): ProcessCameraProvider = suspendCoroutine { continuation ->
     ProcessCameraProvider.getInstance(this).also { cameraProvider ->

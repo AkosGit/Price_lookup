@@ -7,9 +7,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavController
 import com.uni.project.pricelookup.PreferencesManager
 import com.uni.project.pricelookup.components.CameraCapture
-
 @Composable
-fun BarcodeCameraView(navigation: NavController){
+fun ProductCameraView(navigation: NavController){
     val context= LocalContext.current
     val preferencesManager = remember { PreferencesManager(context) }
     CameraCapture(
@@ -18,9 +17,8 @@ fun BarcodeCameraView(navigation: NavController){
         },
         onImageCaptured = {
             val imagePath=it.path.toString()
-            preferencesManager.saveData("photoLoc",imagePath)
+            preferencesManager.saveData("product",imagePath)
             navigation.popBackStack()
-            navigation.navigate("ItemEditScreen")
         }
     )
 }

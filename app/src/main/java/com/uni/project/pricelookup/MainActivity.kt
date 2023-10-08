@@ -75,6 +75,8 @@ class MainActivity : ComponentActivity() {
                 //saving output dir for saving files
                 val context=LocalContext.current
                 val preferencesManager = remember { PreferencesManager(context) }
+                preferencesManager.saveData("photoLoc", "")
+                preferencesManager.saveData("product","")
                 preferencesManager.saveData("outputDir",getOutputDirectory().absolutePath)
 
                 val navController = rememberNavController()
@@ -108,8 +110,8 @@ class MainActivity : ComponentActivity() {
                         composable("SearchScreen/{query}") {backStackEntry ->
                             SearchScreen(navigation = navController,backStackEntry.arguments?.getString("query"))
                         }
-                        composable("ItemEditScreen/{photoLoc}") {backStackEntry ->
-                            ItemEditScreen(navigation = navController,backStackEntry.arguments?.getString("photoLoc"))
+                        composable("ItemEditScreen") {
+                            ItemEditScreen(navigation = navController)
                         }
 
                         composable("ItemDetailsScreen/{itemId}") {backStackEntry ->
@@ -117,6 +119,9 @@ class MainActivity : ComponentActivity() {
                         }
                         composable("BarcodeCameraView") {backStackEntry ->
                             BarcodeCameraView(navigation = navController)
+                        }
+                        composable("ProductCameraView") {backStackEntry ->
+                            ProductCameraView(navigation = navController)
                         }
                         }
                     }
