@@ -9,6 +9,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Menu
 import androidx.compose.material3.*
@@ -24,6 +25,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navigation
 import com.uni.project.pricelookup.Views.*
 import com.uni.project.pricelookup.components.CameraCapture
+import com.uni.project.pricelookup.components.SearchWidget
 import com.uni.project.pricelookup.ui.theme.PriceLookupTheme
 import java.io.File
 
@@ -98,6 +100,32 @@ class MainActivity : ComponentActivity() {
                             }
                         },
                         )
+
+                    Row {
+                        val searchText= remember {
+                            mutableStateOf("")
+                        }
+                        Button(onClick = { navController.navigate("BarcodeCameraView") }) {
+
+                        }
+                        SearchWidget(
+                            text = searchText.value,
+                            onTextChange = {
+                                searchText.value=it
+                                ;
+                            },
+                            onSearchClicked = {
+                                navController.navigate("SearchScreen/{query}".replace(
+                                    oldValue = "{query}",
+                                    newValue = it
+                                ))
+                            },
+                            onCloseClicked = {
+                                searchText.value=""
+                            }
+                        )
+
+                    }
 
                     //basically that's the router :)
                     NavHost(navController = navController, startDestination = "MainPage") {

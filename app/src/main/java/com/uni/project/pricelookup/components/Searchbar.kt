@@ -1,7 +1,10 @@
 package com.uni.project.pricelookup.components
 
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
@@ -24,6 +27,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.unit.sp
 
 
 @OptIn(ExperimentalComposeUiApi::class, ExperimentalMaterial3Api::class)
@@ -45,83 +50,90 @@ fun SearchWidget(
             .semantics {
                 contentDescription = "SearchWidget"
             },
-        //elevation = AppBarDefaults.TopAppBarElevation,
-        color = MaterialTheme.colorScheme.background
-    ) {
-        TextField(
 
-            modifier = Modifier
-                .fillMaxWidth()
-                .semantics {
-                    contentDescription = "TextField"
-                },
-            value = text,
-            onValueChange = { onTextChange(it) },
+        shadowElevation = 8.dp,
+//        color = MaterialTheme.colorScheme.background,
+        color = Color.Green,
 
-            placeholder = {
-                Text(
-                    modifier = Modifier
-                        .alpha(alpha = DefaultAlpha),
-                    text = "Search here...",
-                    color = Color.White
-                )
-            },
-            textStyle = TextStyle(
-                color = MaterialTheme.colorScheme.primary
-            ),
-            singleLine = true,
-            leadingIcon = {
-                IconButton(
-                    modifier = Modifier
-                        .alpha(alpha = DefaultAlpha),
-                    onClick = {onSearchClicked(text)}
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Search,
-                        contentDescription = "Search Icon",
-                        tint = MaterialTheme.colorScheme.background //to be
-                    )
-                }
-            },
-            trailingIcon = {
-                IconButton(
-                    modifier = Modifier
-                        .semantics {
-                            contentDescription = "CloseButton"
-                        },
-                    onClick = {
-                        if (text.isNotEmpty()) {
-                            onTextChange("")
-                        } else {
-                            keyboardController?.hide()
-                            onCloseClicked()
-
-                        }
+        content = {
+            TextField(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .semantics {
+                        contentDescription = "TextField"
                     }
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Close,
-                        contentDescription = "Close Icon",
-                        tint = MaterialTheme.colorScheme.background //to be
+                    .padding(13.dp, 5.dp)
+                    .clip(shape = RoundedCornerShape(size = 20.dp)),
+                value = text,
+                onValueChange = { onTextChange(it) },
+
+                placeholder = {
+                    Text(
+                        modifier = Modifier
+                            .alpha(alpha = DefaultAlpha),
+                        text = "Search here...",
+                        color = MaterialTheme.colorScheme.primary,
+                        fontSize = 12.sp
                     )
-                }
-            },
-            keyboardOptions = KeyboardOptions(
-                imeAction = ImeAction.Search
-            ),
-            keyboardActions = KeyboardActions(
-                onSearch = {
-                    onSearchClicked(text)
-                }
-            ),
-            colors = TextFieldDefaults.textFieldColors(
-                focusedIndicatorColor = Color.Transparent,
-                unfocusedIndicatorColor = Color.Transparent,
-                //backgroundColor = Color.Transparent,
-                cursorColor = MaterialTheme.colorScheme.primaryContainer
+                },
+                textStyle = TextStyle(
+                    fontSize = 12.sp,
+                    color = MaterialTheme.colorScheme.primary
+                ),
+                singleLine = true,
+                leadingIcon = {
+                    IconButton(
+                        modifier = Modifier
+                            .alpha(alpha = DefaultAlpha),
+                        onClick = {onSearchClicked(text)}
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Search,
+                            contentDescription = "Search Icon",
+                            tint = MaterialTheme.colorScheme.background //to be
+                        )
+                    }
+                },
+                trailingIcon = {
+                    IconButton(
+                        modifier = Modifier
+                            .semantics {
+                                contentDescription = "CloseButton"
+                            },
+                        onClick = {
+                            if (text.isNotEmpty()) {
+                                onTextChange("")
+                            } else {
+                                keyboardController?.hide()
+                                onCloseClicked()
+
+                            }
+                        }
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Close,
+                            contentDescription = "Close Icon",
+                            tint = MaterialTheme.colorScheme.background //to be
+                        )
+                    }
+                },
+                keyboardOptions = KeyboardOptions(
+                    imeAction = ImeAction.Search
+                ),
+                keyboardActions = KeyboardActions(
+                    onSearch = {
+                        onSearchClicked(text)
+                    }
+                ),
+                colors = TextFieldDefaults.textFieldColors(
+                    focusedIndicatorColor = Color.Transparent,
+                    unfocusedIndicatorColor = Color.Transparent,
+                    //backgroundColor = Color.Transparent,
+                    cursorColor = MaterialTheme.colorScheme.primaryContainer
+                )
             )
-        )
-    }
+        }
+    )
 }
 
 @Composable
