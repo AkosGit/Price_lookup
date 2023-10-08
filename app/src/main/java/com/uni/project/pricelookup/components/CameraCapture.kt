@@ -1,4 +1,4 @@
-package com.uni.project.pricelookup.Views
+package com.uni.project.pricelookup.components
 
 import android.content.Context
 import android.net.Uri
@@ -47,6 +47,7 @@ fun CameraCapture(
     val context = LocalContext.current
     val preferencesManager = remember { PreferencesManager(context) }
     val outputDirectoryPath=preferencesManager.getData("outputDir","")
+
     val outputDirFile=File(outputDirectoryPath)
     val cameraExecutor = Executors.newSingleThreadExecutor()
 

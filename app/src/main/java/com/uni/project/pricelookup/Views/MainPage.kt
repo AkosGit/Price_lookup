@@ -32,9 +32,6 @@ fun MainPage(navigation: NavController) {
     for (i in 1..20) {
         list.add("asd")
     }
-    val isCamera= remember {
-        mutableStateOf(false)
-    }
 
     Column {
         Row(
@@ -57,22 +54,10 @@ fun MainPage(navigation: NavController) {
             )
 
         }
-        Button(onClick = { isCamera.value=true }) {
+        Button(onClick = { navigation.navigate("BarcodeCameraView") }) {
 
         }
-        if(isCamera.value){
-            CameraCapture(
-                onError = {
-                    Toast.makeText(context, "Error taking photo",Toast.LENGTH_SHORT).show()
-                },
-                onImageCaptured = {
-                    navigation.navigate("ItemEditScreen/{photoLoc}".replace(
-                        oldValue = "{photoLoc}",
-                        newValue = it.path.toString()
-                    ))
-                }
-            )
-        }
+
 
         Text(
             text = "Products that might be of interest",

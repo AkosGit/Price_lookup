@@ -1,11 +1,10 @@
 package com.uni.project.pricelookup
 
 import android.Manifest
-import android.app.Application
-import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.util.Log
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
@@ -22,10 +21,9 @@ import androidx.core.content.ContextCompat
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.uni.project.pricelookup.Views.ItemDetailsScreen
-import com.uni.project.pricelookup.Views.ItemEditScreen
-import com.uni.project.pricelookup.Views.MainPage
-import com.uni.project.pricelookup.Views.SearchScreen
+import androidx.navigation.navigation
+import com.uni.project.pricelookup.Views.*
+import com.uni.project.pricelookup.components.CameraCapture
 import com.uni.project.pricelookup.ui.theme.PriceLookupTheme
 import java.io.File
 
@@ -116,6 +114,9 @@ class MainActivity : ComponentActivity() {
 
                         composable("ItemDetailsScreen/{itemId}") {backStackEntry ->
                             ItemDetailsScreen(navigation = navController,backStackEntry.arguments?.getString("itemId"))
+                        }
+                        composable("BarcodeCameraView") {backStackEntry ->
+                            BarcodeCameraView(navigation = navController)
                         }
                         }
                     }
