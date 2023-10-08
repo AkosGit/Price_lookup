@@ -1,6 +1,7 @@
 package com.uni.project.pricelookup
 
 import android.Manifest
+import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.util.Log
@@ -38,6 +39,17 @@ import java.io.File
 
 
 class MainActivity : ComponentActivity() {
+    companion object{
+        fun CleanUpImages(context: Context){
+            val preferencesManager = PreferencesManager(context)
+            preferencesManager.saveData("photoLoc", "")
+            preferencesManager.saveData("product","")
+            val jpgFiles = File(preferencesManager.getData("outputDir","")).listFiles { file -> file.name.endsWith(".jpg") }
+            jpgFiles?.forEach { file -> file.delete() }
+
+        }
+    }
+
     //camera permisson stuff
     private var shouldShowCamera: MutableState<Boolean> = mutableStateOf(false)
     val requestPermissionLauncher = registerForActivityResult(
@@ -75,6 +87,7 @@ class MainActivity : ComponentActivity() {
 
         return if (mediaDir != null && mediaDir.exists()) mediaDir else filesDir
     }
+
     @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -83,9 +96,8 @@ class MainActivity : ComponentActivity() {
             PriceLookupTheme {
                 //saving output dir for saving files
                 val context=LocalContext.current
+                CleanUpImages(context)
                 val preferencesManager = remember { PreferencesManager(context) }
-                preferencesManager.saveData("photoLoc", "")
-                preferencesManager.saveData("product","")
                 preferencesManager.saveData("outputDir",getOutputDirectory().absolutePath)
 
                 val navController = rememberNavController()

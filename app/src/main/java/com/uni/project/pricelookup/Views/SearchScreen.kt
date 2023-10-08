@@ -9,23 +9,28 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.*
 import coil.compose.AsyncImage
+import com.uni.project.pricelookup.MainActivity
+import com.uni.project.pricelookup.PreferencesManager
 import com.uni.project.pricelookup.components.SearchResultCard
 import com.uni.project.pricelookup.components.SearchWidget
 
 @Composable
 fun SearchScreen(navigation: NavController, query:String?){
-    //Text(text = query.toString())
+
     val searchText= remember {
         mutableStateOf("")
     }
+    val context=LocalContext.current
+    val preferencesManager = remember { PreferencesManager(context) }
+    MainActivity.CleanUpImages(context)
     SearchWidget(
         text = searchText.value,
         onTextChange = {
             searchText.value=it
-            ;
         },
         onSearchClicked = {
 

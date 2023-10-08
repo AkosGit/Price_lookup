@@ -50,6 +50,7 @@ android {
 }
 
 dependencies {
+    implementation("androidx.compose.material3:material3:1.2.0-alpha09")
     implementation("androidx.datastore:datastore-preferences:1.0.0")
     implementation ("androidx.compose.material:material-icons-extended:1.5.3")
     implementation ("androidx.camera:camera-camera2:1.2.3")
