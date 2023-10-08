@@ -4,31 +4,40 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.DefaultAlpha
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 
-@OptIn(ExperimentalMaterial3Api::class)
+
+@OptIn(ExperimentalComposeUiApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun SearchWidget(
     text: String,
     onTextChange: (String) -> Unit,
     onSearchClicked: (String) -> Unit,
-    onCloseClicked: () -> Unit
+    onCloseClicked: () -> Unit,
 ) {
+    val keyboardController = LocalSoftwareKeyboardController.current
+    val searchInFocus = remember {
+        mutableStateOf(false)
+    }
     Surface(
         modifier = Modifier
             .fillMaxWidth()
@@ -40,6 +49,7 @@ fun SearchWidget(
         color = MaterialTheme.colorScheme.background
     ) {
         TextField(
+
             modifier = Modifier
                 .fillMaxWidth()
                 .semantics {
@@ -47,6 +57,7 @@ fun SearchWidget(
                 },
             value = text,
             onValueChange = { onTextChange(it) },
+
             placeholder = {
                 Text(
                     modifier = Modifier
@@ -63,7 +74,7 @@ fun SearchWidget(
                 IconButton(
                     modifier = Modifier
                         .alpha(alpha = DefaultAlpha),
-                    onClick = {}
+                    onClick = {onSearchClicked(text)}
                 ) {
                     Icon(
                         imageVector = Icons.Default.Search,
@@ -82,7 +93,9 @@ fun SearchWidget(
                         if (text.isNotEmpty()) {
                             onTextChange("")
                         } else {
+                            keyboardController?.hide()
                             onCloseClicked()
+
                         }
                     }
                 ) {
