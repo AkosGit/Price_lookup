@@ -8,14 +8,22 @@ import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.CameraAlt
 import androidx.compose.material.icons.rounded.Menu
 import androidx.compose.material3.*
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.unit.dp
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.navigation.compose.NavHost
@@ -24,6 +32,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navigation
 import com.uni.project.pricelookup.Views.*
 import com.uni.project.pricelookup.components.CameraCapture
+import com.uni.project.pricelookup.components.SearchWidget
 import com.uni.project.pricelookup.ui.theme.PriceLookupTheme
 import java.io.File
 
@@ -99,7 +108,54 @@ class MainActivity : ComponentActivity() {
                                 )
                             }
                         },
-                        )
+                        actions = {
+                            IconButton(
+                                onClick = {
+                                    navController.navigate("BarcodeCameraView")
+                                },
+//                                        shape = RoundedCornerShape(size = 20.dp),
+                                content = {
+                                    Icon(
+                                        Icons.Rounded.CameraAlt,
+                                        contentDescription = "Localized description",
+                                        tint = Color.White
+                                    )
+                                }
+                            )
+                        }
+                    )
+
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                        ,
+                        colors = CardDefaults.cardColors(
+                            containerColor = MaterialTheme.colorScheme.background,
+                        ),
+                        shape = RectangleShape,
+                        content = {
+                            val searchText= remember {
+                                mutableStateOf("")
+                            }
+                            SearchWidget(
+                                text = searchText.value,
+                                onTextChange = {
+                                    searchText.value=it
+                                    ;
+                                },
+                                onSearchClicked = {
+                                    navController.navigate("SearchScreen/{query}".replace(
+                                        oldValue = "{query}",
+                                        newValue = it
+                                    ))
+                                },
+                                onCloseClicked = {
+                                    searchText.value=""
+                                }
+                            )
+
+                        }
+                    )
 
                     //basically that's the router :)
                     NavHost(navController = navController, startDestination = "MainPage") {
