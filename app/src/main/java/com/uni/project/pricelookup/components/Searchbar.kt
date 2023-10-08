@@ -52,13 +52,12 @@ fun SearchWidget(
             },
 
         shadowElevation = 8.dp,
-//        color = MaterialTheme.colorScheme.background,
-        color = Color.Green,
+        color = MaterialTheme.colorScheme.background,
 
         content = {
             TextField(
                 modifier = Modifier
-                    .fillMaxSize()
+                    .fillMaxWidth()
                     .semantics {
                         contentDescription = "TextField"
                     }

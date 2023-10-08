@@ -33,31 +33,8 @@ fun MainPage(navigation: NavController) {
     }
 
     Column {
-//        Row(
-//            //horizontalArrangement
-//        ) {SearchWidget(
-//                text = searchText.value,
-//                onTextChange = {
-//                   searchText.value=it
-//                    ;
-//                },
-//                onSearchClicked = {
-//                    navigation.navigate("SearchScreen/{query}".replace(
-//                        oldValue = "{query}",
-//                        newValue = it
-//                    ))
-//                },
-//                onCloseClicked = {
-//                    searchText.value=""
-//                }
-//            )
-//
-//        }
-//        Button(onClick = { navigation.navigate("BarcodeCameraView") }) {
-//
-//        }
-
         Card(
+            modifier = Modifier.padding(start = 5.dp, end = 5.dp),
             colors = CardDefaults.cardColors(
                 containerColor = Color.LightGray.copy(alpha = 0.1f)
             )
@@ -65,15 +42,9 @@ fun MainPage(navigation: NavController) {
             Text(
                 text = "Products that might be of interest",
                 modifier = Modifier
-                    .padding(bottom = 5.dp, top = 3.dp),
+                    .padding(start = 6.dp, top = 10.dp, end = 6.dp),
                 fontWeight = Bold
             )
-//            Divider(
-//                color = Color.Black,
-//                thickness = 2.dp,
-//                modifier = Modifier
-//                    .padding(end= 30.dp, bottom = 20.dp)
-//            )
             PhotoGrid(recommendedItems = list)
         }
 
