@@ -26,9 +26,9 @@ import androidx.compose.ui.unit.dp
 fun ProductPreviewCard() {
     ElevatedCard(
         elevation = CardDefaults.cardElevation(
-            defaultElevation = 6.dp
+            defaultElevation = 30.dp
         ),
-        modifier = Modifier.size(width = 240.dp, height = 100.dp)
+        modifier = Modifier.size(width = 150.dp, height = 100.dp)
     ) {
         Text(
             text = "This will be a pic of a chocolate",
