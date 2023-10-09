@@ -31,10 +31,11 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navigation
+import com.example.compose.PriceLookupTheme
+import com.example.compose.md_theme_dark_primaryContainer
 import com.uni.project.pricelookup.Views.*
 import com.uni.project.pricelookup.components.CameraCapture
 import com.uni.project.pricelookup.components.SearchWidget
-import com.uni.project.pricelookup.ui.theme.PriceLookupTheme
 import java.io.File
 
 
@@ -104,8 +105,8 @@ class MainActivity : ComponentActivity() {
                 Column {
                     TopAppBar(
                         colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-                            containerColor = MaterialTheme.colorScheme.background,
-                            titleContentColor = MaterialTheme.colorScheme.primary,
+                            containerColor = MaterialTheme.colorScheme.tertiary,
+                            titleContentColor = MaterialTheme.colorScheme.onTertiary,
                         ),
                         title = {
                             Text("Price checker")
@@ -116,7 +117,8 @@ class MainActivity : ComponentActivity() {
                             }) {
                                 Icon(
                                     Icons.Rounded.Menu,
-                                    contentDescription = "Localized description"
+                                    contentDescription = "Localized description",
+                                    tint = MaterialTheme.colorScheme.onTertiary
                                 )
                             }
                         },
@@ -130,7 +132,7 @@ class MainActivity : ComponentActivity() {
                                     Icon(
                                         Icons.Rounded.CameraAlt,
                                         contentDescription = "Localized description",
-                                        tint = Color.White
+                                        tint = MaterialTheme.colorScheme.onTertiary
                                     )
                                 }
                             )
@@ -142,7 +144,7 @@ class MainActivity : ComponentActivity() {
                             .fillMaxWidth()
                         ,
                         colors = CardDefaults.cardColors(
-                            containerColor = MaterialTheme.colorScheme.background,
+                            containerColor = MaterialTheme.colorScheme.primary,
                         ),
                         shape = RectangleShape,
                         content = {

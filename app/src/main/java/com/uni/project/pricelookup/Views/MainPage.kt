@@ -36,11 +36,12 @@ fun MainPage(navigation: NavController) {
         Card(
             modifier = Modifier.padding(start = 5.dp, end = 5.dp),
             colors = CardDefaults.cardColors(
-                containerColor = Color.LightGray.copy(alpha = 0.1f)
+                containerColor = MaterialTheme.colorScheme.surface
             )
         ){
             Text(
                 text = "Products that might be of interest",
+                style = MaterialTheme.typography.titleMedium,
                 modifier = Modifier
                     .padding(start = 6.dp, top = 10.dp, end = 6.dp),
                 fontWeight = Bold

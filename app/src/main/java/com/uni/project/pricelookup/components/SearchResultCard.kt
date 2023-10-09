@@ -1,12 +1,13 @@
 package com.uni.project.pricelookup.components
 
 import androidx.compose.foundation.layout.*
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Text
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 
@@ -16,31 +17,44 @@ fun SearchResultCard(
     productName:String,
     productMinPrice:Int
 ){
-    Card(elevation = CardDefaults.cardElevation(
-        defaultElevation = 10.dp
-    ), modifier = Modifier
-        .padding(5.dp)
-        .height(150.dp)
-    )
-    {
-        Row{
-            AsyncImage(
-                model = imageModel,
-                contentDescription = null,
-                modifier = Modifier
-                    .padding(3.dp)
-            )
-            Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
-            ) {
-                Column(modifier = Modifier.padding(3.dp)) {
-                    Text(text = productName)
-                    Text(text = "Minimális ár: $productMinPrice")
-                }
-                
-            }
+    ElevatedCard(
+        elevation = CardDefaults.cardElevation(
+            defaultElevation = 3.dp
+        ),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.onPrimary,
+        ),
+        modifier = Modifier
+            .padding(12.dp, 5.dp),
 
+        content = {
+            Row{
+                AsyncImage(
+                    model = imageModel,
+                    contentDescription = null,
+                    modifier = Modifier
+                        .width(200.dp)
+                        .height(130.dp)
+                        .clip(shape = RoundedCornerShape(size = 3.dp)),
+                )
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Column(modifier = Modifier.padding(3.dp)) {
+                        Text(
+                            text = productName,
+                            color = MaterialTheme.colorScheme.onPrimaryContainer
+                        )
+                        Text(
+                            text = "Minimális ár: $productMinPrice",
+                            color = MaterialTheme.colorScheme.onPrimaryContainer
+                        )
+                    }
+
+                }
+
+            }
         }
-    }
+    )
 }
