@@ -1,6 +1,7 @@
 package com.uni.project.pricelookup.Views
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Text
@@ -16,6 +17,7 @@ import coil.compose.AsyncImage
 import com.uni.project.pricelookup.MainActivity
 import com.uni.project.pricelookup.PreferencesManager
 import com.uni.project.pricelookup.components.SearchResultCard
+import com.uni.project.pricelookup.components.SearchResultList
 import com.uni.project.pricelookup.components.SearchWidget
 
 @Composable
@@ -27,20 +29,14 @@ fun SearchScreen(navigation: NavController, query:String?){
     val context=LocalContext.current
     val preferencesManager = remember { PreferencesManager(context) }
     MainActivity.CleanUpImages(context)
-    SearchWidget(
-        text = searchText.value,
-        onTextChange = {
-            searchText.value=it
-        },
-        onSearchClicked = {
 
-        },
-        onCloseClicked = {
-            searchText.value=""
-        }
-    )
-    SearchResultCard(imageModel ="https://csokizzz.hu/img/9360/7622201803834/7622201803834.jpg" , productName = "milka csoki", productMinPrice =100 )
+//    SearchResultCard(imageModel ="https://csokizzz.hu/img/9360/7622201803834/7622201803834.jpg" , productName = "milka csoki", productMinPrice =100 )
 
+    val list = arrayListOf<String>()
+    for (i in 1..12) {
+        list.add("asd")
+    }
+    SearchResultList(searchResultList = list)
 }
 
 

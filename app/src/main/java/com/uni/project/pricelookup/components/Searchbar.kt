@@ -1,9 +1,6 @@
 package com.uni.project.pricelookup.components
 
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -43,16 +40,17 @@ fun SearchWidget(
     val searchInFocus = remember {
         mutableStateOf(false)
     }
+
+    //ez van a search widget 'mögött/körül' -> amin rajta van
     Surface(
         modifier = Modifier
             .fillMaxWidth()
-            .height(56.dp)
             .semantics {
                 contentDescription = "SearchWidget"
             },
 
         shadowElevation = 8.dp,
-        color = MaterialTheme.colorScheme.background,
+        color = MaterialTheme.colorScheme.tertiary,
 
         content = {
             TextField(
@@ -61,8 +59,8 @@ fun SearchWidget(
                     .semantics {
                         contentDescription = "TextField"
                     }
-                    .padding(13.dp, 5.dp)
-                    .clip(shape = RoundedCornerShape(size = 20.dp)),
+                    .padding(13.dp, 13.dp)
+                    .clip(shape = RoundedCornerShape(size = 30.dp)),
                 value = text,
                 onValueChange = { onTextChange(it) },
 
@@ -72,11 +70,9 @@ fun SearchWidget(
                             .alpha(alpha = DefaultAlpha),
                         text = "Search here...",
                         color = MaterialTheme.colorScheme.primary,
-                        fontSize = 12.sp
                     )
                 },
                 textStyle = TextStyle(
-                    fontSize = 12.sp,
                     color = MaterialTheme.colorScheme.primary
                 ),
                 singleLine = true,
@@ -89,7 +85,7 @@ fun SearchWidget(
                         Icon(
                             imageVector = Icons.Default.Search,
                             contentDescription = "Search Icon",
-                            tint = MaterialTheme.colorScheme.background //to be
+                            tint = MaterialTheme.colorScheme.primary //to be
                         )
                     }
                 },
@@ -112,7 +108,7 @@ fun SearchWidget(
                         Icon(
                             imageVector = Icons.Default.Close,
                             contentDescription = "Close Icon",
-                            tint = MaterialTheme.colorScheme.background //to be
+                            tint = MaterialTheme.colorScheme.primary //to be
                         )
                     }
                 },
@@ -125,10 +121,10 @@ fun SearchWidget(
                     }
                 ),
                 colors = TextFieldDefaults.textFieldColors(
+                    containerColor = MaterialTheme.colorScheme.onPrimary,
                     focusedIndicatorColor = Color.Transparent,
                     unfocusedIndicatorColor = Color.Transparent,
-                    //backgroundColor = Color.Transparent,
-                    cursorColor = MaterialTheme.colorScheme.primaryContainer
+                    cursorColor = MaterialTheme.colorScheme.primary
                 )
             )
         }
