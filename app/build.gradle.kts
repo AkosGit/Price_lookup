@@ -4,6 +4,8 @@ plugins {
 }
 
 android {
+
+
     namespace = "com.uni.project.pricelookup"
     compileSdk = 34
 
@@ -50,6 +52,8 @@ android {
 }
 
 dependencies {
+    implementation("com.github.Breens-Mbaka:Searchable-Dropdown-Menu-Jetpack-Compose:0.3.4")
+    implementation("io.github.oleksandrbalan:modalsheet:0.6.0")
     implementation("androidx.compose.material3:material3:1.2.0-alpha09")
     implementation("androidx.datastore:datastore-preferences:1.0.0")
     implementation ("androidx.compose.material:material-icons-extended:1.5.3")

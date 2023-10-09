@@ -16,37 +16,46 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.uni.project.pricelookup.PreferencesManager
-import androidx.compose.material3.BottomSheetDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import com.uni.project.pricelookup.components.BottomSheet_library
+import com.uni.project.pricelookup.components.ShopDropDown_library
+import eu.wewox.modalsheet.ExperimentalSheetApi
+import eu.wewox.modalsheet.ModalSheet
+import kotlinx.coroutines.*
 
-@OptIn(ExperimentalComposeUiApi::class, ExperimentalMaterialApi::class, ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalComposeUiApi::class, ExperimentalMaterialApi::class, ExperimentalMaterial3Api::class,
+    DelicateCoroutinesApi::class, ExperimentalSheetApi::class
+)
 
 @Composable
 fun ItemEditScreen(navigation: NavController) {
-    //setup dragmodal
-    val modalBottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = false)
-    var showSheet by remember { mutableStateOf(true) }
+    //setup BottomSheet
+    var visible by remember { mutableStateOf(false) }
 
 
     //setup shop chooser
-    val isExpanded= remember {
-        mutableStateOf(false)
-    }
+
     val shop= remember {
         mutableStateOf("spar")
     }
 
-    val context = LocalContext.current
-    val preferencesManager = remember { PreferencesManager(context) }
+    //setup ocr data edit
+    var detectedName= remember {
+        mutableStateOf("")
+    }
+    var detectedPrice= remember {
+        mutableStateOf(0)
+    }
 
     //getting barcode photo
+    val context = LocalContext.current
+    val preferencesManager = remember { PreferencesManager(context) }
     val photoBarCode=preferencesManager.getData("photoLoc","")
 
 
@@ -93,14 +102,14 @@ fun ItemEditScreen(navigation: NavController) {
         ) {
             Box(
                 contentAlignment = Alignment.Center
-            ){
+            ) {
                 Text(text = "Photo of pricetag:")
             }
             Box(
             )
             {
                 AsyncImage(
-                    model  = photoBarCode,
+                    model = photoBarCode,
                     contentDescription = null,
                     modifier = Modifier
                         .padding(5.dp)
@@ -117,30 +126,29 @@ fun ItemEditScreen(navigation: NavController) {
         ) {
             Box(
                 contentAlignment = Alignment.Center
-            ){
+            ) {
                 Text(text = "Photo of product:")
             }
             Box(
 
             )
             {
-                if(photoProduct.value==""){
+                if (photoProduct.value == "") {
 
                     Icon(
                         imageVector = photoPlusSign,
                         contentDescription = "Search Icon",
                         tint = MaterialTheme.colorScheme.background, //to be
-                        modifier= Modifier
+                        modifier = Modifier
                             .padding(5.dp)
                             .height(80.dp)
                             .clickable {
                                 navigation.navigate("ProductCameraView")
                             }
                     )
-                }
-                else{
+                } else {
                     AsyncImage(
-                        model  = photoProduct.value,
+                        model = photoProduct.value,
                         contentDescription = null,
                         modifier = Modifier
                             .padding(5.dp)
@@ -153,83 +161,61 @@ fun ItemEditScreen(navigation: NavController) {
 
             }
         }
-        Row {
+
+
+        Box {
             Text(text = "Choose a shop:")
-            ExposedDropdownMenuBox(
-                modifier = Modifier
-                    .height(100.dp)
-                    .width(100.dp)
-                ,
-                expanded = isExpanded.value,
-                onExpandedChange = {
-                    isExpanded.value=it
-                }
-            ) {
-                DropdownMenuItem(
-                    text = {
-                        Text(text = "Spar")
-                    },
-                    onClick = {
-                        shop.value = "Spar"
-                        isExpanded.value = false
-                    }
-                )
-
-                DropdownMenuItem(
-                    text = {
-                        Text(text = "Lidl")
-                    },
-                    onClick = {
-                        shop.value = "Lidl"
-                        isExpanded.value = false
-                    }
-                )
-
-                DropdownMenuItem(
-                    text = {
-                        Text(text = "Aldi")
-                    },
-                    onClick = {
-                        shop.value = "Aldi"
-                        isExpanded.value = false
-                    }
-                )
-                DropdownMenuItem(
-                    text = {
-                        Text(text = "Auchan")
-                    },
-                    onClick = {
-                        shop.value = "Auchan"
-                        isExpanded.value = false
-                    }
-                )
-
-            }
+            ///ShopDropDown_library(shop)
         }
 
-        ModalBottomSheet(
-            onDismissRequest = {  },
-            sheetState = modalBottomSheetState,
-            dragHandle = { BottomSheetDefaults.DragHandle() },
+
+        Box(
+            modifier = Modifier
+                .fillMaxWidth(),
+            contentAlignment = Alignment.Center
+        )
+        {
+            Button(onClick = { visible = true }) {
+                Text(text = "Edit barcode data")
+            }
+        }
+        ModalSheet(
+            visible = visible,
+            onVisibleChange = { visible = it },
         ) {
-            Column {
-                Row {
-                    Text(text = "Detected product name:")
-                    TextField(value = "", onValueChange = {})
-                }
-                Row {
-                    Text(text = "Detected price:")
-                    TextField(value = "", onValueChange = {})
+            Box(
+                Modifier
+                    .height(200.dp),
+                contentAlignment = Alignment.Center
+
+            ){
+                Column(
+                    modifier = Modifier
+                        .padding(15.dp)
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .padding(bottom = 5.dp)
+                    ) {
+                        Text(
+                            text = "Detected product name:",
+
+                            )
+                        TextField(value = detectedName.value, onValueChange = {detectedName.value=it})
+                    }
+                    Row(
+
+                    ) {
+                        Text(
+                            text = "Detected price:",
+                        )
+                        TextField(value = detectedPrice.value.toString(), onValueChange = {detectedPrice.value=it.toInt()})
+                    }
                 }
             }
         }
-
     }
-
-
 }
-
-
 
 
 
