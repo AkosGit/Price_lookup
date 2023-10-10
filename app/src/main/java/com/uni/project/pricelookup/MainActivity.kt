@@ -148,6 +148,7 @@ class MainActivity : ComponentActivity() {
                                             onClick = {
                                                 scope.launch { drawerState.close() }
                                                 selectedItem.value = item
+                                                navController.navigate(item.path)
                                             },
                                             modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
                                                                 .width(260.dp)
