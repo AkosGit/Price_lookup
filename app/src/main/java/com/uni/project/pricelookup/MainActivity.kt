@@ -24,15 +24,21 @@ import androidx.compose.material.icons.rounded.CameraAlt
 import androidx.compose.material.icons.rounded.Menu
 import androidx.compose.material3.*
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
+import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -46,6 +52,7 @@ import com.uni.project.pricelookup.Views.*
 import com.uni.project.pricelookup.components.CameraCapture
 import com.uni.project.pricelookup.components.SearchWidget
 import java.io.File
+import kotlin.math.roundToInt
 
 //this is professional work :(
 class MainActivity : ComponentActivity() {
@@ -131,7 +138,8 @@ class MainActivity : ComponentActivity() {
                             TopAppBar(
                                 colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
                                     titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
-                                    scrolledContainerColor = MaterialTheme.colorScheme.primaryContainer
+                                    containerColor = MaterialTheme.colorScheme.primaryContainer,
+//                                    scrolledContainerColor = MaterialTheme.colorScheme.primaryContainer
                                 ),
                                 title = {
                                     Text("Price checker")
@@ -172,44 +180,68 @@ class MainActivity : ComponentActivity() {
                             val searchText= remember {
                                 mutableStateOf("")
                             }
-                            SearchWidget(
-                                text = searchText.value,
-                                onTextChange = {
-                                    searchText.value=it;
-                                },
-                                onSearchClicked = {
-                                    navController.navigate("SearchScreen/{query}".replace(
-                                        oldValue = "{query}",
-                                        newValue = it
-                                    ))
-                                },
-                                onCloseClicked = {
-                                    searchText.value=""
-                                },
-                            )
-                            //basically that's the router :)
-                            NavHost(navController = navController, startDestination = "MainPage") {
-                                composable("MainPage") {
-                                    MainPage(navigation = navController)
 
-                                }
-                                composable("SearchScreen/{query}") {backStackEntry ->
-                                    SearchScreen(navigation = navController,backStackEntry.arguments?.getString("query"))
-                                }
-                                composable("ItemEditScreen") {
-                                    ItemEditScreen(navigation = navController)
-                                }
+                            val toolbarHeight = 60.dp
+                            val toolbarHeightPx = with(LocalDensity.current) { toolbarHeight.roundToPx().toFloat() }
 
-                                composable("ItemDetailsScreen/{itemId}") {backStackEntry ->
-                                    ItemDetailsScreen(navigation = navController,backStackEntry.arguments?.getString("itemId"))
-                                }
-                                composable("BarcodeCameraView") {backStackEntry ->
-                                    BarcodeCameraView(navigation = navController)
-                                }
-                                composable("ProductCameraView") {backStackEntry ->
-                                    ProductCameraView(navigation = navController)
+                            val searchBarOffsetHeightPx = remember { mutableStateOf(0f) }
+                            val searchBarNestedScrollConnection = remember {
+                                object : NestedScrollConnection {
+                                    override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
+                                        val delta = available.y
+                                        val newOffset = searchBarOffsetHeightPx.value + delta
+                                        searchBarOffsetHeightPx.value = newOffset.coerceIn(-toolbarHeightPx, 0f)
+                                        return Offset.Zero
+                                    }
                                 }
                             }
+                            Column(
+                                modifier = Modifier
+                                    .nestedScroll(searchBarNestedScrollConnection)
+                                    .offset { IntOffset(x = 0, y = searchBarOffsetHeightPx.value.roundToInt()) },
+                            ){
+                                SearchWidget(
+                                    text = searchText.value,
+                                    onTextChange = {
+                                        searchText.value=it;
+                                    },
+                                    onSearchClicked = {
+                                        navController.navigate("SearchScreen/{query}".replace(
+                                            oldValue = "{query}",
+                                            newValue = it
+                                        ))
+                                    },
+                                    onCloseClicked = {
+                                        searchText.value=""
+                                    },
+                                )
+
+                                //basically that's the router :)
+                                NavHost(navController = navController, startDestination = "MainPage") {
+                                    composable("MainPage") {
+                                        MainPage(navigation = navController)
+
+                                    }
+                                    composable("SearchScreen/{query}") {backStackEntry ->
+                                        SearchScreen(navigation = navController,backStackEntry.arguments?.getString("query"))
+                                    }
+                                    composable("ItemEditScreen") {
+                                        ItemEditScreen(navigation = navController)
+                                    }
+
+                                    composable("ItemDetailsScreen/{itemId}") {backStackEntry ->
+                                        ItemDetailsScreen(navigation = navController,backStackEntry.arguments?.getString("itemId"))
+                                    }
+                                    composable("BarcodeCameraView") {backStackEntry ->
+                                        BarcodeCameraView(navigation = navController)
+                                    }
+                                    composable("ProductCameraView") {backStackEntry ->
+                                        ProductCameraView(navigation = navController)
+                                    }
+                                }
+                            }
+
+
                         }
                     }
                 }
