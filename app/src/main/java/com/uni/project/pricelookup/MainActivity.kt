@@ -102,42 +102,45 @@ class MainActivity : ComponentActivity() {
                 preferencesManager.saveData("outputDir",getOutputDirectory().absolutePath)
 
                 val navController = rememberNavController()
-                Column {
-                    TopAppBar(
-                        colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-                            containerColor = MaterialTheme.colorScheme.tertiary,
-                            titleContentColor = MaterialTheme.colorScheme.onTertiary,
-                        ),
-                        title = {
-                            Text("Price checker")
-                        },
-                        navigationIcon = {
-                            IconButton(onClick = {
-                            // TODO: will need to implement: openNavDrawer()
-                            }) {
-                                Icon(
-                                    Icons.Rounded.Menu,
-                                    contentDescription = "Localized description",
-                                    tint = MaterialTheme.colorScheme.onTertiary
-                                )
-                            }
-                        },
-                        actions = {
-                            IconButton(
-                                onClick = {
-                                    navController.navigate("BarcodeCameraView")
+                Surface (
+                    color = MaterialTheme.colorScheme.background,
+                    content = {
+                        Column {
+                            TopAppBar(
+                                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+                                    containerColor = MaterialTheme.colorScheme.primaryContainer,
+                                    titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                                ),
+                                title = {
+                                    Text("Price checker")
                                 },
+                                navigationIcon = {
+                                    IconButton(onClick = {
+                                        // TODO: will need to implement: openNavDrawer()
+                                    }) {
+                                        Icon(
+                                            Icons.Rounded.Menu,
+                                            contentDescription = "Localized description",
+                                            tint = MaterialTheme.colorScheme.onPrimaryContainer
+                                        )
+                                    }
+                                },
+                                actions = {
+                                    IconButton(
+                                        onClick = {
+                                            navController.navigate("BarcodeCameraView")
+                                        },
 //                                        shape = RoundedCornerShape(size = 20.dp),
-                                content = {
-                                    Icon(
-                                        Icons.Rounded.CameraAlt,
-                                        contentDescription = "Localized description",
-                                        tint = MaterialTheme.colorScheme.onTertiary
+                                        content = {
+                                            Icon(
+                                                Icons.Rounded.CameraAlt,
+                                                contentDescription = "Localized description",
+                                                tint = MaterialTheme.colorScheme.onPrimaryContainer
+                                            )
+                                        }
                                     )
                                 }
                             )
-                        }
-                    )
 
                     Card(
                         modifier = Modifier
@@ -168,33 +171,36 @@ class MainActivity : ComponentActivity() {
                                 }
                             )
 
-                        }
-                    )
+                                }
+                            )
 
-                    //basically that's the router :)
-                    NavHost(navController = navController, startDestination = "MainPage") {
-                        composable("MainPage") {
-                            MainPage(navigation = navController)
+                            //basically that's the router :)
+                            NavHost(navController = navController, startDestination = "MainPage") {
+                                composable("MainPage") {
+                                    MainPage(navigation = navController)
 
-                        }
-                        composable("SearchScreen/{query}") {backStackEntry ->
-                            SearchScreen(navigation = navController,backStackEntry.arguments?.getString("query"))
-                        }
-                        composable("ItemEditScreen") {
-                            ItemEditScreen(navigation = navController)
-                        }
+                                }
+                                composable("SearchScreen/{query}") {backStackEntry ->
+                                    SearchScreen(navigation = navController,backStackEntry.arguments?.getString("query"))
+                                }
+                                composable("ItemEditScreen") {
+                                    ItemEditScreen(navigation = navController)
+                                }
 
-                        composable("ItemDetailsScreen/{itemId}") {backStackEntry ->
-                            ItemDetailsScreen(navigation = navController,backStackEntry.arguments?.getString("itemId"))
-                        }
-                        composable("BarcodeCameraView") {backStackEntry ->
-                            BarcodeCameraView(navigation = navController)
-                        }
-                        composable("ProductCameraView") {backStackEntry ->
-                            ProductCameraView(navigation = navController)
-                        }
+                                composable("ItemDetailsScreen/{itemId}") {backStackEntry ->
+                                    ItemDetailsScreen(navigation = navController,backStackEntry.arguments?.getString("itemId"))
+                                }
+                                composable("BarcodeCameraView") {backStackEntry ->
+                                    BarcodeCameraView(navigation = navController)
+                                }
+                                composable("ProductCameraView") {backStackEntry ->
+                                    ProductCameraView(navigation = navController)
+                                }
+                            }
                         }
                     }
+                )
+
                 }
 
             }

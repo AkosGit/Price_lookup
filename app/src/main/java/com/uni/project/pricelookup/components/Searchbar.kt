@@ -50,7 +50,7 @@ fun SearchWidget(
             },
 
         shadowElevation = 8.dp,
-        color = MaterialTheme.colorScheme.tertiary,
+        color = MaterialTheme.colorScheme.primaryContainer,
 
         content = {
             TextField(
@@ -64,16 +64,23 @@ fun SearchWidget(
                 value = text,
                 onValueChange = { onTextChange(it) },
 
+                colors = TextFieldDefaults.textFieldColors(
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    focusedIndicatorColor = Color.Transparent,
+                    unfocusedIndicatorColor = Color.Transparent,
+                    cursorColor = MaterialTheme.colorScheme.onPrimary
+                ),
+
                 placeholder = {
                     Text(
                         modifier = Modifier
                             .alpha(alpha = DefaultAlpha),
                         text = "Search here...",
-                        color = MaterialTheme.colorScheme.primary,
+                        color = MaterialTheme.colorScheme.onPrimary,
                     )
                 },
                 textStyle = TextStyle(
-                    color = MaterialTheme.colorScheme.primary
+                    color = MaterialTheme.colorScheme.onPrimary
                 ),
                 singleLine = true,
                 leadingIcon = {
@@ -85,7 +92,7 @@ fun SearchWidget(
                         Icon(
                             imageVector = Icons.Default.Search,
                             contentDescription = "Search Icon",
-                            tint = MaterialTheme.colorScheme.primary //to be
+                            tint = MaterialTheme.colorScheme.onPrimary //to be
                         )
                     }
                 },
@@ -108,7 +115,7 @@ fun SearchWidget(
                         Icon(
                             imageVector = Icons.Default.Close,
                             contentDescription = "Close Icon",
-                            tint = MaterialTheme.colorScheme.primary //to be
+                            tint = MaterialTheme.colorScheme.onPrimary //to be
                         )
                     }
                 },
@@ -120,12 +127,7 @@ fun SearchWidget(
                         onSearchClicked(text)
                     }
                 ),
-                colors = TextFieldDefaults.textFieldColors(
-                    containerColor = MaterialTheme.colorScheme.onPrimary,
-                    focusedIndicatorColor = Color.Transparent,
-                    unfocusedIndicatorColor = Color.Transparent,
-                    cursorColor = MaterialTheme.colorScheme.primary
-                )
+
             )
         }
     )

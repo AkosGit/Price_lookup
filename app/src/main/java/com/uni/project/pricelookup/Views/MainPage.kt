@@ -36,7 +36,7 @@ fun MainPage(navigation: NavController) {
         Card(
             modifier = Modifier.padding(start = 5.dp, end = 5.dp),
             colors = CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.surface
+                containerColor = Color.Transparent
             )
         ){
             Text(

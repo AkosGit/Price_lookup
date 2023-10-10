@@ -11,41 +11,22 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.uni.project.pricelookup.R
 
 @Composable
 fun SearchResultList(searchResultList: List<String>) {
-    ElevatedCard(
-        modifier = Modifier
-            .padding(top = 5.dp)
-            .clip(shape = RoundedCornerShape(
-                topStart = 18.dp,
-                topEnd = 18.dp,
-                bottomStart = 0.dp,
-                bottomEnd = 0.dp
-            )),
 
-        elevation = CardDefaults.cardElevation(
-            defaultElevation = 3.dp
-        ),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.primary,
-        ),
-
+    LazyColumn(
         content = {
-            LazyColumn(
-                content = {
-                    items(searchResultList.count()){
-                        SearchResultCard(
-                            imageModel = R.drawable.chocolate_bar1,
-                            productName = "Twix csoki",
-                            productMinPrice =100
-                        )
-                    }
-                }
-            )
+            items(searchResultList.count()){
+                SearchResultCard(
+                    imageModel = R.drawable.chocolate_bar1,
+                    productName = "Twix csoki",
+                    productMinPrice =100
+                )
+            }
         }
     )
-
 }

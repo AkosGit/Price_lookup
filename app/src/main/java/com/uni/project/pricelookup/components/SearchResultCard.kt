@@ -2,6 +2,8 @@ package com.uni.project.pricelookup.components
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.ContentPasteSearch
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -19,10 +21,10 @@ fun SearchResultCard(
 ){
     ElevatedCard(
         elevation = CardDefaults.cardElevation(
-            defaultElevation = 3.dp
+            defaultElevation = 4.dp
         ),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.onPrimary,
+            containerColor = MaterialTheme.colorScheme.surfaceVariant,
         ),
         modifier = Modifier
             .padding(12.dp, 5.dp),
@@ -35,24 +37,48 @@ fun SearchResultCard(
                     modifier = Modifier
                         .width(200.dp)
                         .height(130.dp)
-                        .clip(shape = RoundedCornerShape(size = 3.dp)),
+                        .clip(shape = RoundedCornerShape(size = 1.dp))
+                    ,
                 )
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Column(modifier = Modifier.padding(3.dp)) {
-                        Text(
-                            text = productName,
-                            color = MaterialTheme.colorScheme.onPrimaryContainer
-                        )
-                        Text(
-                            text = "Minimális ár: $productMinPrice",
-                            color = MaterialTheme.colorScheme.onPrimaryContainer
-                        )
+
+                Column {
+                    Box(
+                        contentAlignment = Alignment.CenterStart
+                    ) {
+                        Column() {
+                            Text(
+                                text = productName,
+                            )
+                            Text(
+                                text = "Minimális ár: $productMinPrice",
+                            )
+                        }
                     }
 
+                    Box(
+                        content = {
+                            Button(
+                                onClick = {
+                                    // TODO -> this should take us to the ProductDetails
+                                },
+                                colors = ButtonColors(
+                                    containerColor = MaterialTheme.colorScheme.primary,
+                                    contentColor = MaterialTheme.colorScheme.onPrimary,
+                                    disabledContainerColor = MaterialTheme.colorScheme.inversePrimary,
+                                    disabledContentColor = MaterialTheme.colorScheme.inversePrimary
+                                ),
+                                content = {
+                                    Icon(
+                                        Icons.Rounded.ContentPasteSearch,
+                                        contentDescription = "Localized description",
+                                    )
+                                }
+                            )
+                        }
+                    )
                 }
+
+
 
             }
         }
