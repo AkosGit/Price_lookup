@@ -24,8 +24,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.unit.sp
+import androidx.compose.ui.draw.scale
+import androidx.compose.ui.text.style.TextAlign
 
 
 @OptIn(ExperimentalComposeUiApi::class, ExperimentalMaterial3Api::class)
@@ -49,18 +49,21 @@ fun SearchWidget(
                 contentDescription = "SearchWidget"
             },
 
-        shadowElevation = 8.dp,
         color = MaterialTheme.colorScheme.primaryContainer,
 
         content = {
             TextField(
                 modifier = Modifier
-                    .fillMaxWidth()
                     .semantics {
                         contentDescription = "TextField"
                     }
-                    .padding(13.dp, 13.dp)
-                    .clip(shape = RoundedCornerShape(size = 30.dp)),
+                    .padding(bottom = 5.dp)
+                    .fillMaxWidth()
+                    .scale(.83f)
+                ,
+
+                shape = RoundedCornerShape(size = 30.dp),
+
                 value = text,
                 onValueChange = { onTextChange(it) },
 
@@ -80,14 +83,17 @@ fun SearchWidget(
                     )
                 },
                 textStyle = TextStyle(
-                    color = MaterialTheme.colorScheme.onPrimary
+                    color = MaterialTheme.colorScheme.onPrimary,
+                    fontStyle = MaterialTheme.typography.bodySmall.fontStyle,
+                    textAlign = TextAlign.Start,
+                    fontSize = MaterialTheme.typography.bodyLarge.fontSize
                 ),
                 singleLine = true,
                 leadingIcon = {
                     IconButton(
                         modifier = Modifier
                             .alpha(alpha = DefaultAlpha),
-                        onClick = {onSearchClicked(text)}
+                        onClick = { onSearchClicked(text) }
                     ) {
                         Icon(
                             imageVector = Icons.Default.Search,
@@ -128,7 +134,7 @@ fun SearchWidget(
                     }
                 ),
 
-            )
+                )
         }
     )
 }

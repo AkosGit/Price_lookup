@@ -7,10 +7,18 @@ import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
+import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.gestures.Orientation
+import androidx.compose.foundation.gestures.rememberScrollableState
+import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.CameraAlt
 import androidx.compose.material.icons.rounded.Menu
@@ -23,6 +31,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.core.app.ActivityCompat
@@ -91,6 +100,12 @@ class MainActivity : ComponentActivity() {
 
     @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
+        enableEdgeToEdge(
+            statusBarStyle = SystemBarStyle.light(
+                android.graphics.Color.TRANSPARENT,
+                android.graphics.Color.TRANSPARENT
+            )
+        )
         super.onCreate(savedInstanceState)
         requestCameraPermission()
         setContent {
@@ -104,12 +119,19 @@ class MainActivity : ComponentActivity() {
                 val navController = rememberNavController()
                 Surface (
                     color = MaterialTheme.colorScheme.background,
-                    content = {
-                        Column {
+                ){
+                    val appBarScrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
+
+                    Scaffold(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .nestedScroll(appBarScrollBehavior.nestedScrollConnection)
+                        ,
+                        topBar = {
                             TopAppBar(
                                 colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-                                    containerColor = MaterialTheme.colorScheme.primaryContainer,
                                     titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                                    scrolledContainerColor = MaterialTheme.colorScheme.primaryContainer
                                 ),
                                 title = {
                                     Text("Price checker")
@@ -139,26 +161,21 @@ class MainActivity : ComponentActivity() {
                                             )
                                         }
                                     )
-                                }
+                                },
+                                scrollBehavior = appBarScrollBehavior
                             )
-
-                    Card(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                        ,
-                        colors = CardDefaults.cardColors(
-                            containerColor = MaterialTheme.colorScheme.primary,
-                        ),
-                        shape = RectangleShape,
-                        content = {
+                        },
+                    ) {values ->
+                        Column (
+                            modifier = Modifier.padding(values)
+                        ){
                             val searchText= remember {
                                 mutableStateOf("")
                             }
                             SearchWidget(
                                 text = searchText.value,
                                 onTextChange = {
-                                    searchText.value=it
-                                    ;
+                                    searchText.value=it;
                                 },
                                 onSearchClicked = {
                                     navController.navigate("SearchScreen/{query}".replace(
@@ -168,12 +185,8 @@ class MainActivity : ComponentActivity() {
                                 },
                                 onCloseClicked = {
                                     searchText.value=""
-                                }
+                                },
                             )
-
-                                }
-                            )
-
                             //basically that's the router :)
                             NavHost(navController = navController, startDestination = "MainPage") {
                                 composable("MainPage") {
@@ -199,7 +212,7 @@ class MainActivity : ComponentActivity() {
                             }
                         }
                     }
-                )
+                }
 
                 }
 
