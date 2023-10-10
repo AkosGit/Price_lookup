@@ -47,9 +47,13 @@ fun SearchWidget(
             },
 
         color = MaterialTheme.colorScheme.primaryContainer,
+        shape = RoundedCornerShape(
+            bottomStart = 20.dp,
+            bottomEnd = 20.dp
+        ),
 
         content = {
-            TextField(
+            OutlinedTextField(
                 modifier = Modifier
                     .semantics {
                         contentDescription = "TextField"
@@ -65,10 +69,10 @@ fun SearchWidget(
                 onValueChange = { onTextChange(it) },
 
                 colors = TextFieldDefaults.textFieldColors(
-                    containerColor = MaterialTheme.colorScheme.primary,
-                    focusedIndicatorColor = Color.Transparent,
-                    unfocusedIndicatorColor = Color.Transparent,
-                    cursorColor = MaterialTheme.colorScheme.onPrimary
+                    containerColor = Color.Transparent,
+//                    focusedIndicatorColor = Color.Transparent,
+//                    unfocusedIndicatorColor = Color.Transparent,
+                    cursorColor = MaterialTheme.colorScheme.onPrimaryContainer,
                 ),
 
                 placeholder = {
@@ -76,11 +80,11 @@ fun SearchWidget(
                         modifier = Modifier
                             .alpha(alpha = DefaultAlpha),
                         text = "Search here...",
-                        color = MaterialTheme.colorScheme.onPrimary,
+                        color = MaterialTheme.colorScheme.onPrimaryContainer,
                     )
                 },
                 textStyle = TextStyle(
-                    color = MaterialTheme.colorScheme.onPrimary,
+                    color = MaterialTheme.colorScheme.onPrimaryContainer,
                     fontStyle = MaterialTheme.typography.bodySmall.fontStyle,
                     textAlign = TextAlign.Start,
                     fontSize = MaterialTheme.typography.bodyLarge.fontSize
@@ -95,7 +99,7 @@ fun SearchWidget(
                         Icon(
                             imageVector = Icons.Default.Search,
                             contentDescription = "Search Icon",
-                            tint = MaterialTheme.colorScheme.onPrimary //to be
+                            tint = MaterialTheme.colorScheme.onPrimaryContainer //to be
                         )
                     }
                 },
@@ -118,7 +122,7 @@ fun SearchWidget(
                         Icon(
                             imageVector = Icons.Default.Close,
                             contentDescription = "Close Icon",
-                            tint = MaterialTheme.colorScheme.onPrimary //to be
+                            tint = MaterialTheme.colorScheme.onPrimaryContainer //to be
                         )
                     }
                 },

@@ -19,6 +19,8 @@ import com.uni.project.pricelookup.R
 fun SearchResultList(searchResultList: List<String>) {
 
     LazyColumn(
+        modifier = Modifier.padding(top = 15.dp),
+
         content = {
             items(searchResultList.count()){
                 SearchResultCard(

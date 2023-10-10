@@ -21,6 +21,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.CameraAlt
+import androidx.compose.material.icons.rounded.House
 import androidx.compose.material.icons.rounded.Menu
 import androidx.compose.material3.*
 import androidx.compose.runtime.MutableState
@@ -38,6 +39,7 @@ import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.core.app.ActivityCompat
@@ -51,6 +53,7 @@ import com.example.compose.md_theme_dark_primaryContainer
 import com.uni.project.pricelookup.Views.*
 import com.uni.project.pricelookup.components.CameraCapture
 import com.uni.project.pricelookup.components.SearchWidget
+import com.uni.project.pricelookup.components.selecRandomImg
 import java.io.File
 import kotlin.math.roundToInt
 
@@ -181,7 +184,7 @@ class MainActivity : ComponentActivity() {
                                 mutableStateOf("")
                             }
 
-                            val toolbarHeight = 60.dp
+                            val toolbarHeight = 70.dp
                             val toolbarHeightPx = with(LocalDensity.current) { toolbarHeight.roundToPx().toFloat() }
 
                             val searchBarOffsetHeightPx = remember { mutableStateOf(0f) }
