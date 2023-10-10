@@ -1,5 +1,6 @@
 package com.uni.project.pricelookup.Views
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.ExperimentalMaterialApi
@@ -20,30 +21,19 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
-import com.uni.project.pricelookup.components.BottomSheet_library
-import com.uni.project.pricelookup.components.ShopDropDown_library
+import com.uni.project.pricelookup.components.BottomSheet_google
+import com.uni.project.pricelookup.components.ShopDropDown_google
 import eu.wewox.modalsheet.ExperimentalSheetApi
-import eu.wewox.modalsheet.ModalSheet
 import kotlinx.coroutines.*
+import androidx.compose.material.icons.rounded.CameraEnhance
+import androidx.compose.ui.graphics.Color
 
 @OptIn(ExperimentalComposeUiApi::class, ExperimentalMaterialApi::class, ExperimentalMaterial3Api::class,
     DelicateCoroutinesApi::class, ExperimentalSheetApi::class
 )
-
 @Composable
 fun ItemEditScreen(navigation: NavController) {
-    //setup BottomSheet
-    var visible by remember { mutableStateOf(false) }
-
-
-    //setup shop chooser
-
-    val shop= remember {
-        mutableStateOf("spar")
-    }
 
     //setup ocr data edit
     var detectedName= remember {
@@ -59,7 +49,7 @@ fun ItemEditScreen(navigation: NavController) {
     val photoBarCode=preferencesManager.getData("photoLoc","")
 
 
-    val photoPlusSign= Icons.Rounded.PlusOne
+    val photoPlusSign=androidx.compose.material.icons.Icons.Rounded.CameraEnhance
 
 
     var photoProduct= remember {
@@ -80,7 +70,14 @@ fun ItemEditScreen(navigation: NavController) {
             }
         }
     ) {
-
+        val smallPhotoModifier=Modifier
+            .background(color = MaterialTheme.colorScheme.primaryContainer)
+            .width(80.dp)
+            .height(80.dp)
+        val smallPhotoTextModifier=Modifier
+            .width(150.dp)
+            .height(80.dp)
+        //main photo
         Box(
             modifier = Modifier
                 .fillMaxWidth()
@@ -92,20 +89,22 @@ fun ItemEditScreen(navigation: NavController) {
                 contentDescription = null,
                 modifier = Modifier
                     .padding(20.dp)
-                    .height(300.dp)
+                    .height(200.dp)
                     .fillMaxWidth()
             )
         }
         //price tag photo
         Row(
-            Modifier.padding(top = 30.dp)
         ) {
             Box(
-                contentAlignment = Alignment.Center
+                contentAlignment = Alignment.Center,
+                modifier = smallPhotoTextModifier
             ) {
                 Text(text = "Photo of pricetag:")
             }
             Box(
+                contentAlignment =Alignment.Center,
+                modifier = smallPhotoModifier
             )
             {
                 AsyncImage(
@@ -113,7 +112,8 @@ fun ItemEditScreen(navigation: NavController) {
                     contentDescription = null,
                     modifier = Modifier
                         .padding(5.dp)
-                        .height(80.dp)
+                        .fillMaxSize()
+                        //.height(80.dp)
                         .clickable {
                             photoMain.value = photoBarCode
                         }
@@ -122,14 +122,18 @@ fun ItemEditScreen(navigation: NavController) {
         }
         //product picture
         Row(
-            Modifier.padding(top = 30.dp)
+            Modifier.padding(top = 10.dp)
         ) {
             Box(
-                contentAlignment = Alignment.Center
+                contentAlignment = Alignment.Center,
+                modifier = smallPhotoTextModifier
             ) {
                 Text(text = "Photo of product:")
             }
             Box(
+
+                contentAlignment =Alignment.Center,
+                modifier = smallPhotoModifier
 
             )
             {
@@ -141,7 +145,7 @@ fun ItemEditScreen(navigation: NavController) {
                         tint = MaterialTheme.colorScheme.background, //to be
                         modifier = Modifier
                             .padding(5.dp)
-                            .height(80.dp)
+                            .fillMaxSize()
                             .clickable {
                                 navigation.navigate("ProductCameraView")
                             }
@@ -152,7 +156,7 @@ fun ItemEditScreen(navigation: NavController) {
                         contentDescription = null,
                         modifier = Modifier
                             .padding(5.dp)
-                            .height(80.dp)
+                            //.height(80.dp)
                             .clickable {
                                 photoMain.value = photoProduct.value
                             }
@@ -161,59 +165,29 @@ fun ItemEditScreen(navigation: NavController) {
 
             }
         }
-
-
-        Box {
-            Text(text = "Choose a shop:")
-            ///ShopDropDown_library(shop)
+        //shop selection
+        val shop= remember {
+            mutableStateOf("spar")
+        }
+        Row(Modifier.padding(30.dp)) {
+            Text(text = "Select shop: ")
+            ShopDropDown_google(shop)
         }
 
-
+        //edit barcode details
+        var visible= remember { mutableStateOf(false) }
         Box(
+
             modifier = Modifier
                 .fillMaxWidth(),
             contentAlignment = Alignment.Center
         )
         {
-            Button(onClick = { visible = true }) {
+            Button(onClick = { visible.value = true }) {
                 Text(text = "Edit barcode data")
             }
         }
-        ModalSheet(
-            visible = visible,
-            onVisibleChange = { visible = it },
-        ) {
-            Box(
-                Modifier
-                    .height(200.dp),
-                contentAlignment = Alignment.Center
-
-            ){
-                Column(
-                    modifier = Modifier
-                        .padding(15.dp)
-                ) {
-                    Row(
-                        modifier = Modifier
-                            .padding(bottom = 5.dp)
-                    ) {
-                        Text(
-                            text = "Detected product name:",
-
-                            )
-                        TextField(value = detectedName.value, onValueChange = {detectedName.value=it})
-                    }
-                    Row(
-
-                    ) {
-                        Text(
-                            text = "Detected price:",
-                        )
-                        TextField(value = detectedPrice.value.toString(), onValueChange = {detectedPrice.value=it.toInt()})
-                    }
-                }
-            }
-        }
+        BottomSheet_google(detectedName,detectedPrice,visible)
     }
 }
 
