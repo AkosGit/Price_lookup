@@ -47,7 +47,7 @@ import com.uni.project.pricelookup.components.CameraCapture
 import com.uni.project.pricelookup.components.SearchWidget
 import java.io.File
 
-
+//this is professional work :(
 class MainActivity : ComponentActivity() {
     companion object{
         fun CleanUpImages(context: Context){

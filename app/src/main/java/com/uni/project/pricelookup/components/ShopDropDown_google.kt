@@ -2,10 +2,7 @@ package com.uni.project.pricelookup.components
 
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
-import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ExposedDropdownMenuBox
-import androidx.compose.material3.Text
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
@@ -19,53 +16,43 @@ fun ShopDropDown_google(shop: MutableState<String>){
     val isExpanded= remember {
         mutableStateOf(false)
     }
+    val shops = listOf("Spar","Lidl","Aldi","Auchan")
     ExposedDropdownMenuBox(
         modifier = Modifier
-            .height(100.dp)
-            .width(100.dp),
+            //.height(20.dp)
+            //.width(20.dp)
+        ,
         expanded = isExpanded.value,
         onExpandedChange = {
             isExpanded.value=!isExpanded.value
         }
     ) {
-        DropdownMenuItem(
-            text = {
-                Text(text = "Spar")
-            },
-            onClick = {
-                shop.value = "Spar"
-                isExpanded.value = false
-            }
+        TextField(
+            // The `menuAnchor` modifier must be passed to the text field for correctness.
+            modifier = Modifier.menuAnchor(),
+            readOnly = true,
+            value = shop.value,
+            onValueChange = {},
+            //trailingIcon = ExposedDropdownMenuDefaults.TrailingIcon(expanded = isExpanded.value),
+            colors = ExposedDropdownMenuDefaults.textFieldColors(),
         )
+        ExposedDropdownMenu(
+            expanded = isExpanded.value,
+            onDismissRequest = { isExpanded.value = false },
+        ) {
+            shops.forEach{
+                DropdownMenuItem(
+                    text = {
+                        Text(text = it)
+                    },
+                    onClick = {
+                        shop.value = it
+                        isExpanded.value = false
+                    }
+                )
+            }
 
-        DropdownMenuItem(
-            text = {
-                Text(text = "Lidl")
-            },
-            onClick = {
-                shop.value = "Lidl"
-                isExpanded.value = false
-            }
-        )
-
-        DropdownMenuItem(
-            text = {
-                Text(text = "Aldi")
-            },
-            onClick = {
-                shop.value = "Aldi"
-                isExpanded.value = false
-            }
-        )
-        DropdownMenuItem(
-            text = {
-                Text(text = "Auchan")
-            },
-            onClick = {
-                shop.value = "Auchan"
-                isExpanded.value = false
-            }
-        )
+        }
 
     }
 }

@@ -24,6 +24,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import com.uni.project.pricelookup.components.BottomSheet_library
+import com.uni.project.pricelookup.components.ShopDropDown_google
 import com.uni.project.pricelookup.components.ShopDropDown_library
 import eu.wewox.modalsheet.ExperimentalSheetApi
 import eu.wewox.modalsheet.ModalSheet
@@ -92,13 +93,13 @@ fun ItemEditScreen(navigation: NavController) {
                 contentDescription = null,
                 modifier = Modifier
                     .padding(20.dp)
-                    .height(300.dp)
+                    .height(200.dp)
                     .fillMaxWidth()
             )
         }
         //price tag photo
         Row(
-            Modifier.padding(top = 30.dp)
+            Modifier.padding(top = 20.dp)
         ) {
             Box(
                 contentAlignment = Alignment.Center
@@ -163,9 +164,9 @@ fun ItemEditScreen(navigation: NavController) {
         }
 
 
-        Box {
-            Text(text = "Choose a shop:")
-            ///ShopDropDown_library(shop)
+        Row {
+            Text(text = "Select shop: ")
+            ShopDropDown_google(shop)
         }
 
 
