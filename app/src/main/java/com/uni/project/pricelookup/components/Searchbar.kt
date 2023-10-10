@@ -37,9 +37,6 @@ fun SearchWidget(
     onCloseClicked: () -> Unit,
 ) {
     val keyboardController = LocalSoftwareKeyboardController.current
-    val searchInFocus = remember {
-        mutableStateOf(false)
-    }
 
     //ez van a search widget 'mögött/körül' -> amin rajta van
     Surface(
@@ -139,13 +136,13 @@ fun SearchWidget(
     )
 }
 
-@Composable
-@Preview
-fun SearchWidgetPreview() {
-    SearchWidget(
-        text = "Search",
-        onTextChange = {},
-        onSearchClicked = {},
-        onCloseClicked = {}
-    )
-}
+//@Composable
+//@Preview
+//fun SearchWidgetPreview() {
+//    SearchWidget(
+//        text = "Search",
+//        onTextChange = {},
+//        onSearchClicked = {},
+//        onCloseClicked = {},
+//    )
+//}
