@@ -1,6 +1,7 @@
 package com.uni.project.pricelookup
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Bundle
@@ -20,13 +21,12 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AddLocation
 import androidx.compose.material.icons.rounded.CameraAlt
 import androidx.compose.material.icons.rounded.Menu
+import androidx.compose.material.icons.rounded.Sailing
 import androidx.compose.material3.*
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.mutableFloatStateOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -51,6 +51,7 @@ import com.example.compose.md_theme_dark_primaryContainer
 import com.uni.project.pricelookup.Views.*
 import com.uni.project.pricelookup.components.CameraCapture
 import com.uni.project.pricelookup.components.SearchWidget
+import kotlinx.coroutines.launch
 import java.io.File
 import kotlin.math.roundToInt
 
@@ -105,6 +106,7 @@ class MainActivity : ComponentActivity() {
         return if (mediaDir != null && mediaDir.exists()) mediaDir else filesDir
     }
 
+    @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
     @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge(
@@ -124,126 +126,153 @@ class MainActivity : ComponentActivity() {
                 preferencesManager.saveData("outputDir",getOutputDirectory().absolutePath)
 
                 val navController = rememberNavController()
+
                 Surface (
                     color = MaterialTheme.colorScheme.background,
                 ){
                     val appBarScrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
-
-                    Scaffold(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .nestedScroll(appBarScrollBehavior.nestedScrollConnection)
-                        ,
-                        topBar = {
-                            TopAppBar(
-                                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-                                    titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
-                                    containerColor = MaterialTheme.colorScheme.primaryContainer,
-//                                    scrolledContainerColor = MaterialTheme.colorScheme.primaryContainer
-                                ),
-                                title = {
-                                    Text("Price checker")
-                                },
-                                navigationIcon = {
-                                    IconButton(onClick = {
-                                        // TODO: will need to implement: openNavDrawer()
-                                    }) {
-                                        Icon(
-                                            Icons.Rounded.Menu,
-                                            contentDescription = "Localized description",
-                                            tint = MaterialTheme.colorScheme.onPrimaryContainer
+                    val items= listOf(DrawerMenuItem(name = "Main page",path="MainPage", icon = Icons.Filled.AddLocation))
+                    val selectedItem = remember { mutableStateOf(items[0]) }
+                    val drawerState = rememberDrawerState(DrawerValue.Closed)
+                    val scope = rememberCoroutineScope()
+                    ModalNavigationDrawer(
+                            drawerState = drawerState,
+                            drawerContent = {
+                                ModalDrawerSheet {
+                                    Spacer(Modifier.height(12.dp))
+                                    items.forEach { item ->
+                                        NavigationDrawerItem(
+                                            icon = { Icon(item.icon, contentDescription = null) },
+                                            label = { Text(item.name) },
+                                            selected = item == selectedItem.value,
+                                            onClick = {
+                                                scope.launch { drawerState.close() }
+                                                selectedItem.value = item
+                                            },
+                                            modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
+                                                                .width(260.dp)
                                         )
                                     }
-                                },
-                                actions = {
-                                    IconButton(
-                                        onClick = {
-                                            navController.navigate("BarcodeCameraView")
-                                        },
+                                }
+                            },
+                            content = {
+                                Scaffold(
+                                    modifier = Modifier
+                                        .fillMaxSize()
+                                        .nestedScroll(appBarScrollBehavior.nestedScrollConnection),
+                                    topBar = {
+                                        TopAppBar(
+                                            colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+                                                titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                                                containerColor = MaterialTheme.colorScheme.primaryContainer,
+//                                    scrolledContainerColor = MaterialTheme.colorScheme.primaryContainer
+                                            ),
+                                            title = {
+                                                Text("Price checker")
+                                            },
+                                            navigationIcon = {
+                                                IconButton(onClick = {
+                                                    scope.launch { drawerState.open() }
+                                                }) {
+                                                    Icon(
+                                                        Icons.Rounded.Menu,
+                                                        contentDescription = "Localized description",
+                                                        tint = MaterialTheme.colorScheme.onPrimaryContainer
+                                                    )
+                                                }
+                                            },
+                                            actions = {
+                                                IconButton(
+                                                    onClick = {
+                                                        navController.navigate("BarcodeCameraView")
+                                                    },
 //                                        shape = RoundedCornerShape(size = 20.dp),
-                                        content = {
-                                            Icon(
-                                                Icons.Rounded.CameraAlt,
-                                                contentDescription = "Localized description",
-                                                tint = MaterialTheme.colorScheme.onPrimaryContainer
-                                            )
+                                                    content = {
+                                                        Icon(
+                                                            Icons.Rounded.CameraAlt,
+                                                            contentDescription = "Localized description",
+                                                            tint = MaterialTheme.colorScheme.onPrimaryContainer
+                                                        )
+                                                    }
+                                                )
+                                            },
+                                            scrollBehavior = appBarScrollBehavior
+                                        )
+                                    },
+                                ) {values ->
+                                    Column (
+                                        modifier = Modifier.padding(values)
+                                    ){
+                                        val searchText= remember {
+                                            mutableStateOf("")
                                         }
-                                    )
-                                },
-                                scrollBehavior = appBarScrollBehavior
-                            )
-                        },
-                    ) {values ->
-                        Column (
-                            modifier = Modifier.padding(values)
-                        ){
-                            val searchText= remember {
-                                mutableStateOf("")
-                            }
 
-                            val toolbarHeight = 60.dp
-                            val toolbarHeightPx = with(LocalDensity.current) { toolbarHeight.roundToPx().toFloat() }
+                                        val toolbarHeight = 60.dp
+                                        val toolbarHeightPx = with(LocalDensity.current) { toolbarHeight.roundToPx().toFloat() }
 
-                            val searchBarOffsetHeightPx = remember { mutableStateOf(0f) }
-                            val searchBarNestedScrollConnection = remember {
-                                object : NestedScrollConnection {
-                                    override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
-                                        val delta = available.y
-                                        val newOffset = searchBarOffsetHeightPx.value + delta
-                                        searchBarOffsetHeightPx.value = newOffset.coerceIn(-toolbarHeightPx, 0f)
-                                        return Offset.Zero
+                                        val searchBarOffsetHeightPx = remember { mutableStateOf(0f) }
+                                        val searchBarNestedScrollConnection = remember {
+                                            object : NestedScrollConnection {
+                                                override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
+                                                    val delta = available.y
+                                                    val newOffset = searchBarOffsetHeightPx.value + delta
+                                                    searchBarOffsetHeightPx.value = newOffset.coerceIn(-toolbarHeightPx, 0f)
+                                                    return Offset.Zero
+                                                }
+                                            }
+                                        }
+                                        Column(
+                                            modifier = Modifier
+                                                .nestedScroll(searchBarNestedScrollConnection)
+                                                .offset { IntOffset(x = 0, y = searchBarOffsetHeightPx.value.roundToInt()) },
+                                        ){
+                                            SearchWidget(
+                                                text = searchText.value,
+                                                onTextChange = {
+                                                    searchText.value=it;
+                                                },
+                                                onSearchClicked = {
+                                                    navController.navigate("SearchScreen/{query}".replace(
+                                                        oldValue = "{query}",
+                                                        newValue = it
+                                                    ))
+                                                },
+                                                onCloseClicked = {
+                                                    searchText.value=""
+                                                },
+                                            )
+
+                                            //basically that's the router :)
+                                            NavHost(navController = navController, startDestination = "MainPage") {
+                                                composable("MainPage") {
+                                                    MainPage(navigation = navController)
+
+                                                }
+                                                composable("SearchScreen/{query}") {backStackEntry ->
+                                                    SearchScreen(navigation = navController,backStackEntry.arguments?.getString("query"))
+                                                }
+                                                composable("ItemEditScreen") {
+                                                    ItemEditScreen(navigation = navController)
+                                                }
+
+                                                composable("ItemDetailsScreen/{itemId}") {backStackEntry ->
+                                                    ItemDetailsScreen(navigation = navController,backStackEntry.arguments?.getString("itemId"))
+                                                }
+                                                composable("BarcodeCameraView") {backStackEntry ->
+                                                    BarcodeCameraView(navigation = navController)
+                                                }
+                                                composable("ProductCameraView") {backStackEntry ->
+                                                    ProductCameraView(navigation = navController)
+                                                }
+                                            }
+                                        }
+
+
                                     }
                                 }
                             }
-                            Column(
-                                modifier = Modifier
-                                    .nestedScroll(searchBarNestedScrollConnection)
-                                    .offset { IntOffset(x = 0, y = searchBarOffsetHeightPx.value.roundToInt()) },
-                            ){
-                                SearchWidget(
-                                    text = searchText.value,
-                                    onTextChange = {
-                                        searchText.value=it;
-                                    },
-                                    onSearchClicked = {
-                                        navController.navigate("SearchScreen/{query}".replace(
-                                            oldValue = "{query}",
-                                            newValue = it
-                                        ))
-                                    },
-                                    onCloseClicked = {
-                                        searchText.value=""
-                                    },
-                                )
+                        )
 
-                                //basically that's the router :)
-                                NavHost(navController = navController, startDestination = "MainPage") {
-                                    composable("MainPage") {
-                                        MainPage(navigation = navController)
-
-                                    }
-                                    composable("SearchScreen/{query}") {backStackEntry ->
-                                        SearchScreen(navigation = navController,backStackEntry.arguments?.getString("query"))
-                                    }
-                                    composable("ItemEditScreen") {
-                                        ItemEditScreen(navigation = navController)
-                                    }
-
-                                    composable("ItemDetailsScreen/{itemId}") {backStackEntry ->
-                                        ItemDetailsScreen(navigation = navController,backStackEntry.arguments?.getString("itemId"))
-                                    }
-                                    composable("BarcodeCameraView") {backStackEntry ->
-                                        BarcodeCameraView(navigation = navController)
-                                    }
-                                    composable("ProductCameraView") {backStackEntry ->
-                                        ProductCameraView(navigation = navController)
-                                    }
-                                }
-                            }
-
-
-                        }
-                    }
                 }
 
                 }
