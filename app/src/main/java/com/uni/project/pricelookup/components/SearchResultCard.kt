@@ -9,9 +9,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.uni.project.pricelookup.R
 
@@ -19,7 +19,8 @@ import com.uni.project.pricelookup.R
 fun SearchResultCard(
     imageModel:Any,
     productName:String,
-    productMinPrice:Int
+    productMinPrice:Int,
+    navigation: NavController?
 ){
     ElevatedCard(
         elevation = CardDefaults.cardElevation(
@@ -72,7 +73,7 @@ fun SearchResultCard(
 
                     ElevatedButton(
                         onClick = {
-                            // TODO -> this should take us to the ProductDetails
+                            navigation?.navigate("ItemDetailsScreen/{id}".replace("{id}","1"))
                         },
                         colors = ButtonColors(
                             containerColor = MaterialTheme.colorScheme.primary,
@@ -111,6 +112,7 @@ fun SearchResultCardPreview(){
     SearchResultCard(
         imageModel = R.drawable.chocolate_bar1,
         productName = "Twix csoki",
-        productMinPrice =100
+        productMinPrice =100,
+        navigation = null
     )
 }

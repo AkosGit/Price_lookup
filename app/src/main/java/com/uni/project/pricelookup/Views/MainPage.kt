@@ -46,7 +46,7 @@ fun MainPage(navigation: NavController) {
                     .padding(start = 6.dp, top = 10.dp, end = 6.dp),
                 fontWeight = Bold
             )
-            PhotoGrid(recommendedItems = list)
+            PhotoGrid(recommendedItems = list,navigation)
         }
 
 

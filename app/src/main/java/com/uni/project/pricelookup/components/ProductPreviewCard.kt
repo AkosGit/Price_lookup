@@ -13,16 +13,17 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import com.uni.project.pricelookup.R
 
-@Preview
+
 @Composable
-fun ProductPreviewCard(photo:Int = R.drawable.chocolate_bar1) {
+fun ProductPreviewCard(photo:Int = R.drawable.chocolate_bar1, navigation: NavController?) {
     ElevatedCard(
         modifier = Modifier
             .padding(all = 1.dp)
             .clickable {
-                // TODO : to be implemented
+                navigation?.navigate("ItemDetailsScreen/{id}".replace("{id}","1"))
             },
 
         elevation = CardDefaults.cardElevation(
@@ -59,6 +60,11 @@ fun selecRandomImg(photo: Int): Int{
             }
         }
     }
+}
+@Preview
+@Composable
+fun TestProductPreviewCard(){
+    ProductPreviewCard(navigation = null)
 }
 
 

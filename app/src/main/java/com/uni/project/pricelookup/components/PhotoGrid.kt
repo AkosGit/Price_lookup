@@ -5,16 +5,13 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
-import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-
-import com.uni.project.pricelookup.components.ProductPreviewCard
+import androidx.navigation.NavController
 
 @Composable
-fun PhotoGrid(recommendedItems: List<String>) {
+fun PhotoGrid(recommendedItems: List<String>,navigation: NavController) {
     LazyVerticalGrid(
         columns = GridCells.Adaptive(130.dp),
         modifier = Modifier.fillMaxSize(),
@@ -24,7 +21,8 @@ fun PhotoGrid(recommendedItems: List<String>) {
 
         content = {
             items(recommendedItems.count()) {
-                ProductPreviewCard()
+                ProductPreviewCard(navigation=navigation)
+
             }
         }
     )

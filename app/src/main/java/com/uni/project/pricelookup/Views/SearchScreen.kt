@@ -56,7 +56,7 @@ fun SearchScreen(navigation: NavController, query:String?){
                 fontWeight = FontWeight.Bold
             )
 
-            SearchResultList(searchResultList = list)
+            SearchResultList(searchResultList = list, navigation = navigation)
         }
     }
 
