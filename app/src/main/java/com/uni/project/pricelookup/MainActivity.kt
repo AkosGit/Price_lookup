@@ -11,20 +11,25 @@ import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddLocation
+import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.rounded.CameraAlt
 import androidx.compose.material.icons.rounded.Menu
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.core.app.ActivityCompat
@@ -32,9 +37,12 @@ import androidx.core.content.ContextCompat
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import coil.compose.AsyncImage
 import com.example.compose.PriceLookupTheme
 import com.uni.project.pricelookup.Views.*
+import com.uni.project.pricelookup.components.DrawerCard
 import com.uni.project.pricelookup.components.SearchWidget
+import com.uni.project.pricelookup.components.selecRandomImg
 import kotlinx.coroutines.launch
 import java.io.File
 import kotlin.math.roundToInt
@@ -115,17 +123,38 @@ class MainActivity : ComponentActivity() {
                     color = MaterialTheme.colorScheme.background,
                 ){
                     val appBarScrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
-                    val items= listOf(DrawerMenuItem(name = "Main page",path="MainPage", icon = Icons.Filled.AddLocation))
+                    val items= listOf(
+                        DrawerMenuItem(name = "Main page",path="MainPage", icon = Icons.Filled.Home),
+                        DrawerMenuItem(name = "Main page",path="MainPage", icon = Icons.Filled.Home),
+                        DrawerMenuItem(name = "Main page",path="MainPage", icon = Icons.Filled.Home)
+                    )
                     val selectedItem = remember { mutableStateOf(items[0]) }
                     val drawerState = rememberDrawerState(DrawerValue.Closed)
                     val scope = rememberCoroutineScope()
                     ModalNavigationDrawer(
                             drawerState = drawerState,
                             drawerContent = {
-                                ModalDrawerSheet {
-                                    Spacer(Modifier.height(12.dp))
+                                ModalDrawerSheet(
+                                    drawerContainerColor = MaterialTheme.colorScheme.background,
+                                    drawerContentColor = MaterialTheme.colorScheme.onBackground
+                                ) {
+//                                    Spacer(Modifier.height(12.dp))
+                                    val itemPadding = PaddingValues(horizontal = 0.dp, vertical = 0.dp)
+                                    val drawerWidth = 260.dp
+
+                                    DrawerCard(drawerWidth)
                                     items.forEach { item ->
                                         NavigationDrawerItem(
+                                            colors = NavigationDrawerItemDefaults.colors(
+                                                unselectedContainerColor = MaterialTheme.colorScheme.background,
+                                                unselectedIconColor = MaterialTheme.colorScheme.primary,
+                                                unselectedTextColor = MaterialTheme.colorScheme.primary,
+
+                                                selectedContainerColor = MaterialTheme.colorScheme.primary,
+                                                selectedIconColor = MaterialTheme.colorScheme.onPrimary,
+                                                selectedTextColor = MaterialTheme.colorScheme.onPrimary
+                                            ),
+                                            shape = RectangleShape,
                                             icon = { Icon(item.icon, contentDescription = null) },
                                             label = { Text(item.name) },
                                             selected = item == selectedItem.value,
@@ -134,8 +163,9 @@ class MainActivity : ComponentActivity() {
                                                 selectedItem.value = item
                                                 navController.navigate(item.path)
                                             },
-                                            modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
-                                                                .width(260.dp)
+                                            modifier = Modifier
+                                                .padding(itemPadding)
+                                                .width(drawerWidth)
                                         )
                                     }
                                 }
@@ -210,7 +240,12 @@ class MainActivity : ComponentActivity() {
                                         Column(
                                             modifier = Modifier
                                                 .nestedScroll(searchBarNestedScrollConnection)
-                                                .offset { IntOffset(x = 0, y = searchBarOffsetHeightPx.value.roundToInt()) },
+                                                .offset {
+                                                    IntOffset(
+                                                        x = 0,
+                                                        y = searchBarOffsetHeightPx.value.roundToInt()
+                                                    )
+                                                },
                                         ){
                                             SearchWidget(
                                                 text = searchText.value,
