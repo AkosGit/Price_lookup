@@ -6,33 +6,20 @@ import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.util.Log
-import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.gestures.Orientation
-import androidx.compose.foundation.gestures.rememberScrollableState
-import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddLocation
 import androidx.compose.material.icons.rounded.CameraAlt
 import androidx.compose.material.icons.rounded.Menu
-import androidx.compose.material.icons.rounded.Sailing
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
@@ -45,11 +32,8 @@ import androidx.core.content.ContextCompat
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import androidx.navigation.navigation
 import com.example.compose.PriceLookupTheme
-import com.example.compose.md_theme_dark_primaryContainer
 import com.uni.project.pricelookup.Views.*
-import com.uni.project.pricelookup.components.CameraCapture
 import com.uni.project.pricelookup.components.SearchWidget
 import kotlinx.coroutines.launch
 import java.io.File
@@ -208,8 +192,9 @@ class MainActivity : ComponentActivity() {
                                             mutableStateOf("")
                                         }
 
-                                        val toolbarHeight = 60.dp
-                                        val toolbarHeightPx = with(LocalDensity.current) { toolbarHeight.roundToPx().toFloat() }
+                                        //textField default height = 56.dp, textField padding(bottom=5.dp). Ezekre rájön egy alap padding amin nem lehet változtatni még akkor sem ha külön beaállítjuk, h ne legyen (top=3.dp) -> 56+5+3=64.dp
+                                        val searchBarHeightDp = 64.dp
+                                        val searchBarHeightPx = with(LocalDensity.current) { searchBarHeightDp.roundToPx().toFloat() }
 
                                         val searchBarOffsetHeightPx = remember { mutableStateOf(0f) }
                                         val searchBarNestedScrollConnection = remember {
@@ -217,7 +202,7 @@ class MainActivity : ComponentActivity() {
                                                 override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
                                                     val delta = available.y
                                                     val newOffset = searchBarOffsetHeightPx.value + delta
-                                                    searchBarOffsetHeightPx.value = newOffset.coerceIn(-toolbarHeightPx, 0f)
+                                                    searchBarOffsetHeightPx.value = newOffset.coerceIn(-searchBarHeightPx, 0f)
                                                     return Offset.Zero
                                                 }
                                             }

@@ -140,13 +140,13 @@ fun SearchWidget(
     )
 }
 
-//@Composable
-//@Preview
-//fun SearchWidgetPreview() {
-//    SearchWidget(
-//        text = "Search",
-//        onTextChange = {},
-//        onSearchClicked = {},
-//        onCloseClicked = {},
-//    )
-//}
+@Composable
+@Preview
+fun SearchWidgetPreview() {
+    SearchWidget(
+        text = "Search",
+        onTextChange = {},
+        onSearchClicked = {},
+        onCloseClicked = {},
+    )
+}
