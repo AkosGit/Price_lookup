@@ -34,8 +34,10 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
 import com.example.compose.PriceLookupTheme
@@ -118,6 +120,7 @@ class MainActivity : ComponentActivity() {
                 preferencesManager.saveData("outputDir",getOutputDirectory().absolutePath)
 
                 val navController = rememberNavController()
+                val NavigationState= navController.currentBackStackEntryAsState()
 
                 Surface (
                     color = MaterialTheme.colorScheme.background,
@@ -247,21 +250,23 @@ class MainActivity : ComponentActivity() {
                                                     )
                                                 },
                                         ){
-                                            SearchWidget(
-                                                text = searchText.value,
-                                                onTextChange = {
-                                                    searchText.value=it;
-                                                },
-                                                onSearchClicked = {
-                                                    navController.navigate("SearchScreen/{query}".replace(
-                                                        oldValue = "{query}",
-                                                        newValue = it
-                                                    ))
-                                                },
-                                                onCloseClicked = {
-                                                    searchText.value=""
-                                                },
-                                            )
+                                            if(NavigationState.value?.destination ==navController.findDestination("SearchScreen") || NavigationState.value?.destination==navController.findDestination("MainPage")){
+                                                SearchWidget(
+                                                    text = searchText.value,
+                                                    onTextChange = {
+                                                        searchText.value=it;
+                                                    },
+                                                    onSearchClicked = {
+                                                        navController.navigate("SearchScreen/{query}".replace(
+                                                            oldValue = "{query}",
+                                                            newValue = it
+                                                        ))
+                                                    },
+                                                    onCloseClicked = {
+                                                        searchText.value=""
+                                                    },
+                                                )
+                                            }
 
                                             //basically that's the router :)
                                             NavHost(navController = navController, startDestination = "MainPage") {
