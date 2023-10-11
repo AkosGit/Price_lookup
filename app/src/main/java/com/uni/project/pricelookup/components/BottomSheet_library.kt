@@ -6,6 +6,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import eu.wewox.modalsheet.ExperimentalSheetApi
 import eu.wewox.modalsheet.ModalSheet
@@ -19,12 +20,12 @@ fun BottomSheet_google(detectedName: MutableState<String>, detectedPrice:Mutable
     ModalSheet(
         visible = visible.value,
         onVisibleChange = { visible.value = it },
-        backgroundColor = MaterialTheme.colorScheme.primaryContainer
+        backgroundColor = Color.Red
     ) {
         Box(
             Modifier
                 .height(200.dp)
-                .background(color = MaterialTheme.colorScheme.secondary),
+                .background(color = Color.Green),
             contentAlignment = Alignment.Center
 
         ) {

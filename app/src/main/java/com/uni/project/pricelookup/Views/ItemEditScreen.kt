@@ -84,6 +84,9 @@ fun ItemEditScreen(navigation: NavController) {
         val smallPhotoTextModifier= Modifier
             .width(150.dp)
             .height(80.dp)
+
+
+
         //main photo
         Box(modifier = Modifier.fillMaxWidth()){
             Card(modifier = Modifier.padding(defaultBigCardPadding)) {
@@ -98,6 +101,8 @@ fun ItemEditScreen(navigation: NavController) {
                 )
             }
         }
+
+        //small photos
         Box (modifier = Modifier.fillMaxWidth()) {
             Card(modifier = Modifier
                 .padding(defaultBigCardPadding)
@@ -187,23 +192,17 @@ fun ItemEditScreen(navigation: NavController) {
             }
         }
 
-
-
-
-
         //shop selection
         val shop= remember {
             mutableStateOf("spar")
         }
         Row(Modifier.padding(30.dp)) {
-            Text(text = "Select shop: ")
             ShopDropDown_google(shop)
         }
 
         //edit barcode details
         var visible= remember { mutableStateOf(false) }
         Box(
-
             modifier = Modifier
                 .fillMaxWidth(),
             contentAlignment = Alignment.Center
