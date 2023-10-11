@@ -1,8 +1,10 @@
 package com.uni.project.pricelookup.Views
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.PlusOne
@@ -27,13 +29,18 @@ import com.uni.project.pricelookup.components.ShopDropDown_google
 import eu.wewox.modalsheet.ExperimentalSheetApi
 import kotlinx.coroutines.*
 import androidx.compose.material.icons.rounded.CameraEnhance
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
+import com.uni.project.pricelookup.R
 
 @OptIn(ExperimentalComposeUiApi::class, ExperimentalMaterialApi::class, ExperimentalMaterial3Api::class,
     DelicateCoroutinesApi::class, ExperimentalSheetApi::class
 )
 @Composable
 fun ItemEditScreen(navigation: NavController) {
+
+    val defaultBigCardPadding = PaddingValues(start = 10.dp, top = 5.dp, end = 10.dp, bottom = 5.dp)
 
     //setup ocr data edit
     var detectedName= remember {
@@ -70,101 +77,120 @@ fun ItemEditScreen(navigation: NavController) {
             }
         }
     ) {
-        val smallPhotoModifier=Modifier
+        val smallPhotoModifier= Modifier
             .background(color = MaterialTheme.colorScheme.primaryContainer)
             .width(80.dp)
             .height(80.dp)
-        val smallPhotoTextModifier=Modifier
+        val smallPhotoTextModifier= Modifier
             .width(150.dp)
             .height(80.dp)
         //main photo
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-
-        )
-        {
-            AsyncImage(
-                model = photoMain.value,
-                contentDescription = null,
-                modifier = Modifier
-                    .padding(20.dp)
-                    .height(200.dp)
-                    .fillMaxWidth()
-            )
-        }
-        //price tag photo
-        Row(
-        ) {
-            Box(
-                contentAlignment = Alignment.Center,
-                modifier = smallPhotoTextModifier
-            ) {
-                Text(text = "Photo of pricetag:")
-            }
-            Box(
-                contentAlignment =Alignment.Center,
-                modifier = smallPhotoModifier
-            )
-            {
+        Box(modifier = Modifier.fillMaxWidth()){
+            Card(modifier = Modifier.padding(defaultBigCardPadding)) {
                 AsyncImage(
-                    model = photoBarCode,
+                    model = photoMain.value,
                     contentDescription = null,
+
                     modifier = Modifier
-                        .padding(5.dp)
-                        .fillMaxSize()
-                        //.height(80.dp)
-                        .clickable {
-                            photoMain.value = photoBarCode
-                        }
+                        .padding(20.dp)
+                        .height(200.dp)
+                        .fillMaxWidth(),
                 )
             }
         }
-        //product picture
-        Row(
-            Modifier.padding(top = 10.dp)
-        ) {
-            Box(
-                contentAlignment = Alignment.Center,
-                modifier = smallPhotoTextModifier
+        Box (modifier = Modifier.fillMaxWidth()) {
+            Card(modifier = Modifier
+                .padding(defaultBigCardPadding)
+                .fillMaxWidth()
             ) {
-                Text(text = "Photo of product:")
-            }
-            Box(
-
-                contentAlignment =Alignment.Center,
-                modifier = smallPhotoModifier
-
-            )
-            {
-                if (photoProduct.value == "") {
-
-                    Icon(
-                        imageVector = photoPlusSign,
-                        contentDescription = "Search Icon",
-                        tint = MaterialTheme.colorScheme.background, //to be
-                        modifier = Modifier
-                            .padding(5.dp)
-                            .fillMaxSize()
-                            .clickable {
-                                navigation.navigate("ProductCameraView")
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceAround,
+                    verticalAlignment = Alignment.CenterVertically
+                ){
+                    ElevatedCard(
+                        modifier = Modifier.padding(defaultBigCardPadding)
+                    ){
+                        Column (
+//                            verticalArrangement = Arrangement.Center,
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ){
+                            Box(
+                                modifier = Modifier
+                                    .width(150.dp)
+                                    .height(200.dp)
+                                    .clickable {
+                                        photoMain.value = photoBarCode
+                                    }
+                            ){
+                                AsyncImage(
+                                    model = photoBarCode,
+                                    contentDescription = null,
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .clip(shape = RoundedCornerShape(10.dp))
+                                )
                             }
-                    )
-                } else {
-                    AsyncImage(
-                        model = photoProduct.value,
-                        contentDescription = null,
-                        modifier = Modifier
-                            .padding(5.dp)
-                            //.height(80.dp)
-                            .clickable {
-                                photoMain.value = photoProduct.value
+
+                            Text(text = "Photo of pricetag")
+                        }
+                    }
+
+                    ElevatedCard(
+                        modifier = Modifier.padding(defaultBigCardPadding)
+                    ) {
+                        Column(
+//                            verticalArrangement = Arrangement.Center,
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Box(
+                                modifier = Modifier
+                                    .width(150.dp)
+                                    .height(200.dp)
+                                    .clickable {
+                                        photoMain.value = photoBarCode
+                                    }
+                            ){
+                                if (photoProduct.value == "") {
+                                    Box(
+                                        modifier = Modifier
+                                            .fillMaxSize()
+                                            .clickable {
+                                                navigation.navigate("ProductCameraView")
+                                            }
+                                    ){
+                                        Image(
+                                            painterResource(R.mipmap.ic_launcher_foreground),
+                                            contentDescription = "appIcon",
+                                            modifier = Modifier
+                                                .fillMaxSize()
+                                        )
+                                    }
+                                }
+                                else {
+                                    AsyncImage(
+                                        model = photoProduct.value,
+                                        contentDescription = null,
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .clip(shape = RoundedCornerShape(10.dp))
+                                            .clickable {
+                                                photoMain.value = photoProduct.value
+                                            }
+                                    )
+                                }
                             }
-                    )
+                            Text(text = "Photo of product")
+                        }
+                    }
                 }
-
             }
         }
+
+
+
+
+
         //shop selection
         val shop= remember {
             mutableStateOf("spar")
