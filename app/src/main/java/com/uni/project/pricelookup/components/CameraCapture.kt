@@ -9,19 +9,18 @@ import androidx.camera.core.ImageCaptureException
 import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.sharp.Lens
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.remember
+import androidx.compose.material3.Button
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -32,6 +31,7 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.coroutineScope
 import androidx.lifecycle.lifecycleScope
+import coil.compose.AsyncImage
 import com.uni.project.pricelookup.PreferencesManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -56,7 +56,7 @@ fun CameraCapture(
     val outputDirectoryPath=preferencesManager.getData("outputDir","")
 
     val outputDirFile=File(outputDirectoryPath)
-    val cameraExecutor = Executors.newSingleThreadExecutor()
+    var cameraExecutor = Executors.newSingleThreadExecutor()
 
     // 1
     val lensFacing = CameraSelector.LENS_FACING_BACK
@@ -65,7 +65,7 @@ fun CameraCapture(
     val preview = Preview.Builder().build()
     val previewView = remember { PreviewView(context) }
     val imageCapture: ImageCapture = remember { ImageCapture.Builder().build() }
-    val cameraSelector = CameraSelector.Builder()
+    var cameraSelector = CameraSelector.Builder()
         .requireLensFacing(lensFacing)
         .build()
 
@@ -76,7 +76,9 @@ fun CameraCapture(
         outputDirectory: File,
         executor: Executor,
         onImageCaptured: (Uri) -> Unit,
-        onError: (ImageCaptureException) -> Unit
+        onError: (ImageCaptureException) -> Unit,
+        IsPhotoTaken: MutableState<String>,
+        PhotoPath: MutableState<Uri>
     ) {
 
         val photoFile = File(
@@ -95,10 +97,12 @@ fun CameraCapture(
             override fun onImageSaved(outputFileResults: ImageCapture.OutputFileResults) {
                 val savedUri = Uri.fromFile(photoFile)
                 CoroutineScope(Dispatchers.Main).launch {
-                    onImageCaptured(savedUri)
+                    //onImageCaptured(savedUri)
+                    IsPhotoTaken.value="yes"
+                    PhotoPath.value=savedUri
+
                 }
-                lifecycleOwner.lifecycleScope.coroutineContext.cancel()
-                cameraExecutor.shutdownNow()
+
             }
         })
     }
@@ -119,7 +123,12 @@ fun CameraCapture(
     // 3
     Box(contentAlignment = Alignment.BottomCenter, modifier = Modifier.fillMaxSize()) {
         AndroidView({ previewView }, modifier = Modifier.fillMaxSize())
-
+        val IsPhototaken= remember {
+            mutableStateOf("no")
+        }
+        val PhotoPath= remember {
+        mutableStateOf(Uri.EMPTY)
+    }
         IconButton(
             modifier = Modifier.padding(bottom = 20.dp),
             onClick = {
@@ -130,7 +139,9 @@ fun CameraCapture(
                     outputDirectory = outputDirFile,
                     executor = cameraExecutor,
                     onImageCaptured = onImageCaptured,
-                    onError = onError
+                    onError = onError,
+                    IsPhotoTaken=IsPhototaken,
+                    PhotoPath=PhotoPath
                 )
             },
             content = {
@@ -145,9 +156,33 @@ fun CameraCapture(
                 )
             }
         )
+        if(IsPhototaken.value=="yes"){
+            Column(
+                modifier = Modifier.fillMaxSize()
+                    .background(MaterialTheme.colorScheme.background)
+            ) {
+                AsyncImage(model = PhotoPath.value, contentDescription = "", modifier = Modifier
+                    .height(500.dp)
+                    .fillMaxWidth())
+                Button( onClick = {
+                    onImageCaptured(PhotoPath.value)
+                    lifecycleOwner.lifecycleScope.coroutineContext.cancel()
+                    cameraExecutor.shutdownNow()
+                }) {//replace with icon
+                    Text(text = "Use")
+                }
+                Button( onClick = {
+                    IsPhototaken.value="no"
+
+                    //TODO: delete old file
+                }) {//replace with icon
+                    Text(text = "Retry")
+                }
+
+            }
+        }
     }
 }
-
 
 
 private suspend fun Context.getCameraProvider(): ProcessCameraProvider = suspendCoroutine { continuation ->

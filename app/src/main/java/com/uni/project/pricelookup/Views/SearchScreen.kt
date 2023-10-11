@@ -19,10 +19,7 @@ import androidx.navigation.*
 import coil.compose.AsyncImage
 import com.uni.project.pricelookup.MainActivity
 import com.uni.project.pricelookup.PreferencesManager
-import com.uni.project.pricelookup.components.PhotoGrid
-import com.uni.project.pricelookup.components.SearchResultCard
 import com.uni.project.pricelookup.components.SearchResultList
-import com.uni.project.pricelookup.components.SearchWidget
 
 @Composable
 fun SearchScreen(navigation: NavController, query:String?){
