@@ -1,5 +1,6 @@
 package com.uni.project.pricelookup.Views
 
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -32,6 +33,8 @@ import androidx.compose.material.icons.rounded.CameraEnhance
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import com.google.mlkit.vision.text.Text
+import com.uni.project.pricelookup.ML.OCR
 import com.uni.project.pricelookup.R
 
 @OptIn(ExperimentalComposeUiApi::class, ExperimentalMaterialApi::class, ExperimentalMaterial3Api::class,
@@ -200,6 +203,19 @@ fun ItemEditScreen(navigation: NavController) {
             ShopDropDown_google(shop)
         }
 
+        fun OnOCRSucces(visionText: Text){
+            Toast.makeText(context,visionText.text,Toast.LENGTH_LONG).show()
+        }
+        fun OnOCRFail(Error: Exception){
+            Toast.makeText(context,Error.message,Toast.LENGTH_LONG).show()
+        }
+
+        Button( onClick = {
+            val ocr=OCR(photoBarCode,context)
+        }) {
+            Text(text = "Process barcode image")
+        }
+
         //edit barcode details
         var visible= remember { mutableStateOf(false) }
         Box(
@@ -212,9 +228,11 @@ fun ItemEditScreen(navigation: NavController) {
                 Text(text = "Edit barcode data")
             }
         }
+
         BottomSheet_google(detectedName,detectedPrice,visible)
     }
 }
+
 
 
 
