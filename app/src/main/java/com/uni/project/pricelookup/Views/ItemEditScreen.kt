@@ -212,6 +212,7 @@ fun ItemEditScreen(navigation: NavController) {
 
         Button( onClick = {
             val ocr=OCR(photoBarCode,context)
+            ocr.DOTHETHING(photoBarCode,context,{text-> })
         }) {
             Text(text = "Process barcode image")
         }
