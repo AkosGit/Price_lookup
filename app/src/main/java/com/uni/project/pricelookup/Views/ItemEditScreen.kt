@@ -34,6 +34,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import com.google.mlkit.vision.text.Text
+import com.uni.project.pricelookup.HTTP
 import com.uni.project.pricelookup.ML.OCR
 import com.uni.project.pricelookup.R
 
@@ -211,8 +212,9 @@ fun ItemEditScreen(navigation: NavController) {
         }
 
         Button( onClick = {
-            val ocr=OCR(photoBarCode,context)
-            ocr.DOTHETHING(photoBarCode,context,{text-> })
+            //val ocr=OCR()
+            //ocr.MakeOCR(photoBarCode,context,{text-> })
+            HTTP().SendImage(photoBarCode)
         }) {
             Text(text = "Process barcode image")
         }

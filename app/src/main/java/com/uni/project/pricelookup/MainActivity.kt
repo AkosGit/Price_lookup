@@ -41,6 +41,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
 import com.example.compose.PriceLookupTheme
+import com.uni.project.pricelookup.ML.OCR
 import com.uni.project.pricelookup.Views.*
 import com.uni.project.pricelookup.components.DrawerCard
 import com.uni.project.pricelookup.components.SearchWidget
@@ -113,6 +114,8 @@ class MainActivity : ComponentActivity() {
         requestCameraPermission()
         setContent {
             PriceLookupTheme {
+                //OCR().TEST(LocalContext.current)
+                //HTTP().SendImage("")
                 //saving output dir for saving files
                 val context=LocalContext.current
                 CleanUpImages(context)
