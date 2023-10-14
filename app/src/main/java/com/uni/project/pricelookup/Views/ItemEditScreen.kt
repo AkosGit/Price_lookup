@@ -7,8 +7,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.PlusOne
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -31,11 +29,9 @@ import eu.wewox.modalsheet.ExperimentalSheetApi
 import kotlinx.coroutines.*
 import androidx.compose.material.icons.rounded.CameraEnhance
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import com.google.mlkit.vision.text.Text
 import com.uni.project.pricelookup.HTTP
-import com.uni.project.pricelookup.ML.OCR
 import com.uni.project.pricelookup.R
 
 @OptIn(ExperimentalComposeUiApi::class, ExperimentalMaterialApi::class, ExperimentalMaterial3Api::class,
@@ -214,7 +210,7 @@ fun ItemEditScreen(navigation: NavController) {
         Button( onClick = {
             //val ocr=OCR()
             //ocr.MakeOCR(photoBarCode,context,{text-> })
-            HTTP().SendImage(photoBarCode)
+            HTTP().sendImage(photoBarCode)
         }) {
             Text(text = "Process barcode image")
         }

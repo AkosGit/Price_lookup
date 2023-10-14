@@ -115,7 +115,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             PriceLookupTheme {
                 //OCR().TEST(LocalContext.current)
-                //HTTP().SendImage("")
+                HTTP().getAllImagesByItemId(1)
                 //saving output dir for saving files
                 val context=LocalContext.current
                 CleanUpImages(context)
