@@ -73,25 +73,17 @@ class OCR()  {
             }
         }
 
+
         //remove blocks that have very different text angle to the currency block
         val ANGLE_DIFFERENCE=5
-        /*for (b in AllBlocks){
-            //lines not in ANGLE_DIFFERENCE
-            if(b.lines[0].angle-ANGLE_DIFFERENCE >currentBlock!!.lines[0].angle || b.lines[0].angle+ANGLE_DIFFERENCE< currentBlock.lines[0].angle){
-                AllBlocks.remove(b)
-            }
-        }*/
         val notInSameAngle = Predicate<TextBlock> { b: TextBlock -> b.lines[0].angle-ANGLE_DIFFERENCE >currentBlock!!.lines[0].angle || b.lines[0].angle+ANGLE_DIFFERENCE< currentBlock.lines[0].angle }
         remove(AllBlocks,notInSameAngle)
 
+
         //remove blocks that have 3 letters or fewer
         val threeCharactersOrMore=Regex(".*\\D{3}.*")
-        /*for (b in AllBlocks){
-            if(!threeCharactersOrMore.containsMatchIn(b.text.replace(" ",""))){
-                AllBlocks.remove(b)
-            }
-        }*/
-        val NotThreeCharactersOrMore = Predicate<TextBlock> { b: TextBlock -> !threeCharactersOrMore.containsMatchIn(b.text.replace(" ","")) }
+        val isGramInIt=Regex("\\d{2}\\s?g|\\d{2}\\s?G")
+        val NotThreeCharactersOrMore = Predicate<TextBlock> { b: TextBlock -> !threeCharactersOrMore.containsMatchIn(b.text.replace(" ","")) && !isGramInIt.containsMatchIn(b.text) }
         remove(AllBlocks,NotThreeCharactersOrMore)
         //lines that are closest in the img to the currency line, one of them is the title
         val blockDistancesByTop= mutableListOf<Int>()
@@ -101,20 +93,48 @@ class OCR()  {
             blockDistancesByBottom.add(abs(currentBlock.lines[0].boundingBox!!.bottom-b!!.lines[0].boundingBox!!.bottom))
         }
 
+
         //index of min distance top/bottom neighbor
         val minTopIndex=blockDistancesByTop.indexOf(blockDistancesByTop.min())
         blockDistancesByBottom[minTopIndex]=10000000 //avoid choosing same element
         val minBottomIndex=blockDistancesByBottom.indexOf(blockDistancesByBottom.min())
 
-        val minTopText=AllBlocks[minBottomIndex].text
+        val minTopText=AllBlocks[minTopIndex].text
         val minBottomText=AllBlocks[minBottomIndex].text
+
+
+        var productTitleIndex=0
         var productTitle=""
         if( minTopText.length > minBottomText.length){
-            productTitle=minTopText
+            productTitleIndex=minTopIndex
         }
         else{
-            productTitle=minBottomText
+            productTitleIndex=minBottomIndex
         }
+        productTitle=AllBlocks[productTitleIndex].text.replace("\n","")
+
+
+        //if previous block have 3 characters atleast they are part of the title
+        // TODO: find better filter for this
+        if(productTitleIndex-1>=0){
+            if(threeCharactersOrMore.containsMatchIn(AllBlocks[productTitleIndex-1].text)){
+                productTitle=productTitle+" "+AllBlocks[productTitleIndex-1].text.replace("\n","")
+            }
+        }
+
+        //the xxxg text is the last part of title, so every block should be added to the title until gram can be found
+        if(!isGramInIt.containsMatchIn(productTitle)){
+            var i=productTitleIndex+1
+            var found=false
+            while (!found && i<AllBlocks.size){
+                productTitle=productTitle+" "+AllBlocks[i].text
+                if(isGramInIt.containsMatchIn(AllBlocks[i].text)){
+                    found=true
+                }
+                i++
+            }
+        }
+
         Toast.makeText(context,productTitle,Toast.LENGTH_LONG).show()
 
         //line that has similar text to product img text
