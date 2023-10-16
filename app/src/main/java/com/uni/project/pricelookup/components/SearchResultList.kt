@@ -12,22 +12,25 @@ import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.uni.project.pricelookup.R
+import com.uni.project.pricelookup.models.SearchResult
+import kotlinx.coroutines.launch
 
 @Composable
-fun SearchResultList(navigation: NavController, searchResultList: List<String>) {
-
+fun SearchResultList(navigation: NavController, searchResultList: MutableState<SearchResult?>) {
     LazyColumn(
         modifier = Modifier.padding(top = 15.dp),
-
+//        if(csabi.state.hallod){throw error('no.. I am asleep')}
         content = {
-            items(searchResultList.count()){
+            items(searchResultList.value!!.searchResult) {item ->
                 SearchResultCard(
-                    imageModel = R.drawable.chocolate_bar1,
-                    productName = "Twix csoki",
-                    productMinPrice =100,
-                    navigation =navigation
+                    imageModel = item,
+                    productName = item.ProductName,
+                    productMinPrice = item.Prices.minOf { price -> price.Price  },
+                    navigation = navigation
                 )
+
             }
+
         }
     )
 }

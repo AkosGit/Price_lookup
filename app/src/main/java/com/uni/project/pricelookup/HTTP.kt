@@ -84,16 +84,23 @@ class HTTP(
                 }
             }
     }
-    fun searchProductByname(productName:String){
+    fun searchProductByname(productName:String, onSuccess:(res:SearchResult) -> Unit,onFailure: ()-> Unit,onNetworkError: (statusCode: Int)-> Unit){
         //returns: one image(pictures table random), prices(prices table(shop_name, price)), productname, ItemId
         LOG("sending new product: "+productName)
         Fuel.get("$baseURL/api/product/search/byname/", listOf("productName" to productName))
             .responseObject<SearchResult> { _, _, result ->
                 when (result) {
                     is Result.Success -> {
-                        LOG(result.value.searchResult[0].ProductName)
+                        onSuccess.invoke(result.value)
                     }
-                    is Result.Failure -> TODO()
+                    is Result.Failure -> {
+                        if(result.error.response.statusCode==406){
+                            onFailure.invoke()
+                        }
+                        else{
+                            onNetworkError(result.error.response.statusCode)
+                        }
+                    }
                 }
             }
     }
