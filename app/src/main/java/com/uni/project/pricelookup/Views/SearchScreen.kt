@@ -1,5 +1,6 @@
 package com.uni.project.pricelookup.Views
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.Card
@@ -21,6 +22,8 @@ import com.uni.project.pricelookup.MainActivity
 import com.uni.project.pricelookup.PreferencesManager
 import com.uni.project.pricelookup.components.SearchResultList
 
+@OptIn(DelicateCoroutinesApi::class)
+@SuppressLint("CoroutineCreationDuringComposition")
 @Composable
 fun SearchScreen(navigation: NavController, query:String?){
 
