@@ -1,5 +1,6 @@
 package com.uni.project.pricelookup.Views
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.Card
@@ -7,6 +8,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -17,10 +19,15 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.*
 import coil.compose.AsyncImage
+import com.uni.project.pricelookup.HTTP
 import com.uni.project.pricelookup.MainActivity
 import com.uni.project.pricelookup.PreferencesManager
 import com.uni.project.pricelookup.components.SearchResultList
+import com.uni.project.pricelookup.models.SearchResult
+import kotlinx.coroutines.*
 
+@OptIn(DelicateCoroutinesApi::class)
+@SuppressLint("CoroutineCreationDuringComposition")
 @Composable
 fun SearchScreen(navigation: NavController, query:String?){
 
@@ -30,15 +37,27 @@ fun SearchScreen(navigation: NavController, query:String?){
     val context=LocalContext.current
     val preferencesManager = remember { PreferencesManager(context) }
     MainActivity.CleanUpImages(context)
-
-//    SearchResultCard(imageModel ="https://csokizzz.hu/img/9360/7622201803834/7622201803834.jpg" , productName = "milka csoki", productMinPrice =100 )
-
-    val list = arrayListOf<String>()
-    for (i in 1..12) {
-        list.add("asd")
+    val isLoaded = remember {
+        mutableStateOf(false)
     }
+    var results = remember {
+        mutableStateOf<SearchResult?>(null)
+    }
+    val client=HTTP()
+//    CoroutineScope(Dispatcher.IO).launch {
+//
+//        CoroutineScope(Dispatchers.Main).launch {
+//            //onImageCaptured(savedUri)
+//            IsPhotoTaken.value="yes"
+//            PhotoPath.value=savedUri
+//
+//        }
+//    }
+//    client.searchProductByname(query.)
+
 
     Column {
+//        if()
         Card(
             modifier = Modifier.padding(start = 5.dp, end = 5.dp),
             colors = CardDefaults.cardColors(
@@ -52,8 +71,10 @@ fun SearchScreen(navigation: NavController, query:String?){
                     .padding(start = 6.dp, top = 10.dp, end = 6.dp),
                 fontWeight = FontWeight.Bold
             )
+            if(results.value!=null){
+                SearchResultList(searchResultList = results, navigation = navigation)
+            }
 
-            SearchResultList(searchResultList = list, navigation = navigation)
         }
     }
 
