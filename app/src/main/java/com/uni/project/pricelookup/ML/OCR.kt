@@ -23,7 +23,7 @@ class OCR()  {
     }
     fun TEST(context: Context){
         //val testIMG=com.uni.project.pricelookup.R.drawable.lidl_close_pricetag_other_text spar_big_pricetag
-        val testIMG=com.uni.project.pricelookup.R.drawable.lidl_close_pricetag_other_text
+        val testIMG=com.uni.project.pricelookup.R.drawable.spar_big_pricetag
         var path: Uri = Uri.parse("android.resource://com.uni.project.pricelookup/" + testIMG)
         val recognizer = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS)
         val img = InputImage.fromFilePath(context,path)
@@ -57,13 +57,19 @@ class OCR()  {
         val blocks=result.textBlocks;
         //TODO: if ft+price in the same block cant be found search for price block close to ft
         var currentBlock:TextBlock? = null
-        val currencyregex = Regex("(\\d*)\\D*FT")
+        val currencyregex = Regex("(\\d+)\\D*FT")
         var AllBlocks= mutableListOf<TextBlock>() //first it will contain all blocks which are not currency related than it will be filtered to search for product
         //search for block that has currency in it rest will go to AllBlocks
         var currency:Int=0
+        var isFT=false
+        var ftBlock:TextBlock?=null
         for (b in blocks){
             val text=b.text.uppercase()
             AllBlocks.add(b)
+            if(text.contains("FT") && !isFT){
+                isFT=true
+                ftBlock=b
+            }
             if(currencyregex.containsMatchIn(text)){
                 if(currency==0){ //grab frist price block because irs scanning from the top to the bottom
                     currentBlock=b
@@ -71,6 +77,10 @@ class OCR()  {
                 }
                 AllBlocks.remove(b) //remove all currency blocks
             }
+        }
+        //if no blocks can be found with curreny+FT, merge FT+currency
+        if(currentBlock==null && isFT){
+            //search for num
         }
 
 
