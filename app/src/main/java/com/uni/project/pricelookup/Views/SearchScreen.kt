@@ -90,8 +90,8 @@ fun SearchScreen(navigation: NavController, query:String?){
                 }
             }
         }
-        else if(isFailed.value){
-            Text(text = "Nol items found!")
+        if(isFailed.value){
+            Text(text = "No items found!")
         }
         else{
             NetworkError()

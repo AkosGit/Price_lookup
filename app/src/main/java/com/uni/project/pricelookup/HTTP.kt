@@ -10,7 +10,8 @@ import com.github.kittinunf.result.Result
 import com.uni.project.pricelookup.models.*
 
 class HTTP(
-    var baseURL:String = "http://192.168.0.235:3000"
+//    var baseURL:String = "http://192.168.0.235:3000" //akos
+    var baseURL:String = "http://192.168.0.184:3000"   //csabi
 ) {
     private fun LOG(msg:String){
         Log.i("SEND_HTTP",msg)
