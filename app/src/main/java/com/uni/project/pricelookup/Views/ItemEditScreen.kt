@@ -210,7 +210,7 @@ fun ItemEditScreen(navigation: NavController) {
         Button( onClick = {
             //val ocr=OCR()
             //ocr.MakeOCR(photoBarCode,context,{text-> })
-            HTTP().sendImage(photoBarCode)
+            //HTTP().sendImage(photoBarCode)
         }) {
             Text(text = "Process barcode image")
         }

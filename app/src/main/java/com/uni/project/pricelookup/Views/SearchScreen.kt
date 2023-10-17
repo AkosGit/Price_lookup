@@ -44,38 +44,52 @@ fun SearchScreen(navigation: NavController, query:String?){
         mutableStateOf<SearchResult?>(null)
     }
     val client=HTTP()
-//    CoroutineScope(Dispatcher.IO).launch {
-//
-//        CoroutineScope(Dispatchers.Main).launch {
-//            //onImageCaptured(savedUri)
-//            IsPhotoTaken.value="yes"
-//            PhotoPath.value=savedUri
-//
-//        }
-//    }
-//    client.searchProductByname(query.)
-
+    CoroutineScope(Dispatchers.IO).launch {
+        client.searchProductByname(
+            query!!,{
+                //onSuccess
+                results.value=it
+                isLoaded.value=true
+                this.cancel("Fuck you")
+            }, {
+               //onFailure
+                isFailed.value=true
+                this.cancel("Fuck you")
+            },{
+                //onNetworkError
+                isNetworkError.value=true
+                this.cancel("Fuck you")
+            }
+        )
+    }
 
     Column {
-//        if()
-        Card(
-            modifier = Modifier.padding(start = 5.dp, end = 5.dp),
-            colors = CardDefaults.cardColors(
-                containerColor = Color.Transparent
-            )
-        ){
-            Text(
-                text = "Products for ${searchText.value}",
-                style = MaterialTheme.typography.titleMedium,
-                modifier = Modifier
-                    .padding(start = 6.dp, top = 10.dp, end = 6.dp),
-                fontWeight = FontWeight.Bold
-            )
-            if(results.value!=null){
-                SearchResultList(searchResultList = results, navigation = navigation)
+        if(isLoaded.value){
+            Card(
+                modifier = Modifier.padding(start = 5.dp, end = 5.dp),
+                colors = CardDefaults.cardColors(
+                    containerColor = Color.Transparent
+                )
+            ){
+                Text(
+                    text = "Products for ${searchText.value}",
+                    style = MaterialTheme.typography.titleMedium,
+                    modifier = Modifier
+                        .padding(start = 6.dp, top = 10.dp, end = 6.dp),
+                    fontWeight = FontWeight.Bold
+                )
+                if(results.value!=null){
+                    SearchResultList(searchResultList = results, navigation = navigation)
+                }
             }
-
         }
+        else if(isFailed.value){
+            Text(text = "Nol items found!")
+        }
+        else{
+            NetworkError()
+        }
+
     }
 
 }
