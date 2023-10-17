@@ -93,7 +93,7 @@ fun SearchScreen(navigation: NavController, query:String?){
         if(isFailed.value){
             Text(text = "No items found!")
         }
-        else{
+        if(isNetworkError.value){
             NetworkError()
         }
 

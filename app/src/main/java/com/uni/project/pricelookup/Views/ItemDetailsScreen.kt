@@ -98,7 +98,12 @@ fun ItemDetailsScreen(navigation: NavController,itemId:String?) {
                     contentDescription = null,
                     contentScale = ContentScale.Crop,
                     modifier = Modifier
-                        .clip(shape = RoundedCornerShape(bottomEnd = 10.dp, bottomStart = 10.dp)) //not workiing csaaabi heeelp
+                        .clip(
+                            shape = RoundedCornerShape(
+                                bottomEnd = 10.dp,
+                                bottomStart = 10.dp
+                            )
+                        ) //not workiing csaaabi heeelp
                         .fillMaxWidth()
                         .padding(start = 30.dp, end = 30.dp, bottom = 30.dp),
                 )
@@ -135,13 +140,14 @@ fun ItemDetailsScreen(navigation: NavController,itemId:String?) {
                     .padding(start = 10.dp, end = 12.dp) // not workiing csaaabi heeelp
             ) {
 
-                LazyColumn (
+                LazyColumn(
+
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(20.dp)//not working
                 )
                 {
-                    items(product.value!!.Prices){ item:Price->
+                    items(product.value!!.Prices) { item ->
                         Row {
                             Text(text = "${item.ShopName}:", color = Color.Black)
                             Text(text = "${item.Price} FT", color = Color.Black)

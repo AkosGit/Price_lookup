@@ -85,7 +85,7 @@ class HTTP(
     }
     private fun addProduct(productName: String,shop:String,price:Int,productImagePath: String?,onSuccess:(res:Int) -> Unit,onFailure: ()-> Unit,onNetworkError: (statusCode: Int)-> Unit){
         LOG("sending new product: "+productName)
-        Fuel.put("$baseURL/api/product/create")
+        Fuel.post("$baseURL/api/product/create")
             .jsonBody(NewProduct(productName,shop,price))
             .responseObject<ItemId> { _, _, result ->
                 when (result) {
