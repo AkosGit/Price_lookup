@@ -38,7 +38,8 @@ fun SearchResultList(navigation: NavController, searchResultList: MutableState<S
                     productName = item.ProductName,
                     imageModel = bitmap,
                     productMinPrice = item.Prices.minOf { price -> price.Price  },
-                    navigation = navigation
+                    navigation = navigation,
+                    ItemId = item.id
                 )
 
             }

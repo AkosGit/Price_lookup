@@ -20,7 +20,8 @@ fun SearchResultCard(
     imageModel:Any,
     productName:String,
     productMinPrice:Int,
-    navigation: NavController?
+    navigation: NavController?,
+    ItemId:Int
 ){
     ElevatedCard(
         elevation = CardDefaults.cardElevation(
@@ -73,7 +74,7 @@ fun SearchResultCard(
 
                     ElevatedButton(
                         onClick = {
-                            navigation?.navigate("ItemDetailsScreen/{id}".replace("{id}","1"))
+                            navigation?.navigate("ItemDetailsScreen/{id}".replace("{id}",ItemId.toString()  ))
                         },
                         colors = ButtonColors(
                             containerColor = MaterialTheme.colorScheme.primary,
@@ -113,6 +114,7 @@ fun SearchResultCardPreview(){
         imageModel = R.drawable.chocolate_bar1,
         productName = "Twix csoki",
         productMinPrice =100,
-        navigation = null
+        navigation = null,
+        ItemId = 0
     )
 }

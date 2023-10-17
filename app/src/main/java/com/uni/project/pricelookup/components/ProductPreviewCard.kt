@@ -1,5 +1,6 @@
 package com.uni.project.pricelookup.components
 
+import android.graphics.BitmapFactory
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -14,29 +15,38 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import coil.compose.AsyncImage
 import com.uni.project.pricelookup.R
+import com.uni.project.pricelookup.models.Product
+import kotlin.io.encoding.Base64
+import kotlin.io.encoding.ExperimentalEncodingApi
 
 
+@OptIn(ExperimentalEncodingApi::class)
 @Composable
-fun ProductPreviewCard(photo:Int = R.drawable.chocolate_bar1, navigation: NavController?) {
+fun ProductPreviewCard(photo:Int = R.drawable.chocolate_bar1, navigation: NavController?,item:Product?) {
+    val decodedString = item?.Pictures?.get(0)?.let { Base64.decode(it.image, 0) }
+    val bitmap= BitmapFactory.decodeByteArray(decodedString, 0, decodedString!!.size)
     ElevatedCard(
         modifier = Modifier
             .padding(all = 1.dp)
             .clickable {
-                navigation?.navigate("ItemDetailsScreen/{id}".replace("{id}","1"))
+                if (item != null) {
+                    navigation?.navigate("ItemDetailsScreen/{id}".replace("{id}",item.id.toString()))
+                }
             },
 
         elevation = CardDefaults.cardElevation(
             defaultElevation = 4.dp
         )
     ) {
-        Image(
+        AsyncImage(
             modifier = Modifier
                 .width(200.dp)
                 .height(130.dp)
                 .clip(shape = RoundedCornerShape(size = 12.dp)),
 
-            painter = painterResource(id = selecRandomImg(photo)),
+            model = bitmap,
             contentDescription = null,
             contentScale = ContentScale.Crop
         )
@@ -64,7 +74,7 @@ fun selecRandomImg(photo: Int): Int{
 @Preview
 @Composable
 fun TestProductPreviewCard(){
-    ProductPreviewCard(navigation = null)
+    ProductPreviewCard(navigation = null, item = null)
 }
 
 

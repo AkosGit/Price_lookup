@@ -1,5 +1,6 @@
 package com.uni.project.pricelookup.Views
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.*
@@ -13,18 +14,51 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight.Companion.Bold
 import androidx.compose.ui.unit.dp
 import androidx.navigation.*
+import com.uni.project.pricelookup.HTTP
+import com.uni.project.pricelookup.components.NetworkError
 import com.uni.project.pricelookup.components.PhotoGrid
+import com.uni.project.pricelookup.models.SearchResult
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.launch
+
+@SuppressLint("CoroutineCreationDuringComposition")
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun MainPage(navigation: NavController) {
-    val context= LocalContext.current
-    val searchText= remember {
-        mutableStateOf("")
+    val isLoaded = remember {
+        mutableStateOf(false)
     }
-    val list = arrayListOf<String>()
-    for (i in 1..20) {
-        list.add("asd")
+    val isNetworkError = remember {
+        mutableStateOf(false)
     }
+    val isFailed = remember {
+        mutableStateOf(false)
+    }
+    val results = remember {
+        mutableStateOf<SearchResult?>(null)
+    }
+    val client= HTTP()
+    CoroutineScope(Dispatchers.IO).launch {
+        client.getRecommendations({
+                //onSuccess
+                results.value=it
+                isLoaded.value=true
+                this.cancel("Fuck you")
+            }, {
+                //onFailure
+                isFailed.value=true
+                this.cancel("Fuck you")
+            },{
+                //onNetworkError
+                isNetworkError.value=true
+                this.cancel("Fuck you")
+            }
+        )
+    }
+
+
 
     Column {
         Card(
@@ -40,7 +74,17 @@ fun MainPage(navigation: NavController) {
                     .padding(start = 6.dp, top = 10.dp, end = 6.dp),
                 fontWeight = Bold
             )
-            PhotoGrid(recommendedItems = list,navigation)
+            if(isLoaded.value){
+                PhotoGrid(recommendedItems = results.value!!,navigation)
+            }
+            if(isFailed.value){
+                Text(text = "No products can be found")
+            }
+            if(isNetworkError.value){
+                Text(text = "A network error has occured! :(")
+                NetworkError()
+            }
+
         }
 
 

@@ -33,13 +33,24 @@ import androidx.compose.ui.res.painterResource
 import com.google.mlkit.vision.text.Text
 import com.uni.project.pricelookup.HTTP
 import com.uni.project.pricelookup.R
+import com.uni.project.pricelookup.components.NetworkError
+import com.uni.project.pricelookup.models.SearchResult
 
 @OptIn(ExperimentalComposeUiApi::class, ExperimentalMaterialApi::class, ExperimentalMaterial3Api::class,
     DelicateCoroutinesApi::class, ExperimentalSheetApi::class
 )
 @Composable
 fun ItemEditScreen(navigation: NavController) {
-
+    val isLoaded = remember {
+        mutableStateOf(false)
+    }
+    val isNetworkError = remember {
+        mutableStateOf(false)
+    }
+    val isFailed = remember {
+        mutableStateOf(false)
+    }
+    val client=HTTP()
     val defaultBigCardPadding = PaddingValues(start = 10.dp, top = 5.dp, end = 10.dp, bottom = 5.dp)
 
     //setup ocr data edit
@@ -227,8 +238,34 @@ fun ItemEditScreen(navigation: NavController) {
                 Text(text = "Edit barcode data")
             }
         }
+        Button(onClick = {
+            CoroutineScope(Dispatchers.IO).launch {
+                client.updateProduct(detectedName.value,shop.value,detectedPrice.value,photoProduct.value, {
+                        //onSuccess
+                        isLoaded.value=true
+                        this.cancel("Fuck you")
+                    }, {
+                        //onFailure
+                        isFailed.value=true
+                        this.cancel("Fuck you")
+                    },{
+                        //onNetworkError
+                        isNetworkError.value=true
+                        this.cancel("Fuck you")
+                    }
+                )
+            }
+        }) {
+
+        }
 
         BottomSheet_google(detectedName,detectedPrice,visible)
+        if(isNetworkError.value){
+            NetworkError()
+        }
+        if(isFailed.value){
+            NetworkError()
+        }
     }
 }
 

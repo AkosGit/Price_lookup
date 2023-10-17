@@ -16,7 +16,7 @@ class HTTP(
         Log.i("SEND_HTTP",msg)
     }
     //ItemEditScreen
-     fun sendImage(path:String,ItemId:Int){
+     fun sendImage(path:String,ItemId:Int,onSuccess:(res:Int) -> Unit,onFailure: ()-> Unit,onNetworkError: (statusCode: Int)-> Unit){
          //sends product image to pictures table
          LOG("sending image: "+path)
          val file = FileDataPart.from(path, name = "file")
@@ -25,13 +25,40 @@ class HTTP(
              .responseString { _, _, result ->
                  when (result) {
                      is Result.Success -> {
-                         LOG(result.value)
+                         onSuccess.invoke(1)
                      }
-                     is Result.Failure -> TODO()
+                     is Result.Failure -> {
+                         if(result.error.response.statusCode==406){
+                             onFailure.invoke()
+                         }
+                         else{
+                             onNetworkError.invoke(result.error.response.statusCode)
+                         }
+
+                     }
                  }
              }
     }
-    fun updateProduct(productName: String,shop:String,price:Int,productImagePath: String?){
+    fun getProduct(ItemId:String,onSuccess:(res:Product) -> Unit,onFailure: ()-> Unit,onNetworkError: (statusCode: Int)-> Unit){
+        Fuel.get("$baseURL/api/product/GetById/$ItemId")
+            .responseObject<Product> { _, _, result ->
+                when (result) {
+                    is Result.Success -> {
+                        onSuccess.invoke(result.value)
+                    }
+                    is Result.Failure -> {
+                        if(result.error.response.statusCode==406){
+                            onFailure.invoke()
+                        }
+                        else{
+                            onNetworkError.invoke(result.error.response.statusCode)
+                        }
+
+                    }
+                }
+            }
+    }
+    fun updateProduct(productName: String,shop:String,price:Int,productImagePath: String?,onSuccess:(res:Int) -> Unit,onFailure: ()-> Unit,onNetworkError: (statusCode: Int)-> Unit){
         //updates or adds product to d
         //returns: OK
         LOG("updateing product: "+productName)
@@ -41,18 +68,21 @@ class HTTP(
                 when (result) {
                     is Result.Success -> {
                         if(productImagePath!=null){
-                            sendImage(productImagePath,result.value.ItemId)
+                            sendImage(productImagePath,result.value.ItemId,onSuccess,onFailure,onNetworkError)
                         }
                     }
                     is Result.Failure -> {
                         if(result.error.response.statusCode==406){
-                            addProduct(productName,shop,price,productImagePath)
+                            addProduct(productName,shop,price,productImagePath,onSuccess,onFailure,onNetworkError)
+                        }
+                        else{
+                            onNetworkError.invoke(result.error.response.statusCode)
                         }
                     }
                 }
             }
     }
-    private fun addProduct(productName: String,shop:String,price:Int,productImagePath: String?){
+    private fun addProduct(productName: String,shop:String,price:Int,productImagePath: String?,onSuccess:(res:Int) -> Unit,onFailure: ()-> Unit,onNetworkError: (statusCode: Int)-> Unit){
         LOG("sending new product: "+productName)
         Fuel.put("$baseURL/api/product/create")
             .jsonBody(NewProduct(productName,shop,price))
@@ -61,12 +91,16 @@ class HTTP(
                     is Result.Success -> {
 
                         if(productImagePath!=null){
-                            sendImage(productImagePath,result.value.ItemId)
+                            sendImage(productImagePath,result.value.ItemId,onSuccess,onFailure,onNetworkError)
                         }
-
                     }
                     is Result.Failure -> {
-
+                        if(result.error.response.statusCode==406){
+                            onFailure.invoke()
+                        }
+                        else{
+                            onNetworkError.invoke(result.error.response.statusCode)
+                        }
                     }
                 }
             }
@@ -75,12 +109,22 @@ class HTTP(
 
 
     //itemDetails Screen and search screen
-    fun getAllImagesByItemId(itemID:Int){
+    fun getAllImagesByItemId(itemID:Int,onSuccess:(res:Images) -> Unit,onFailure: ()-> Unit,onNetworkError: (statusCode: Int)-> Unit){
         LOG("reuqest sent for get images")
         Fuel.get("$baseURL/api/img/1")
             .responseObject<Images>{ _, _, result ->
-                for (img in result.get()!!.images){
-                    LOG(img)
+                when (result) {
+                    is Result.Success -> {
+                        onSuccess.invoke(result.value)
+                    }
+                    is Result.Failure -> {
+                        if(result.error.response.statusCode==406){
+                            onFailure.invoke()
+                        }
+                        else{
+                            onNetworkError.invoke(result.error.response.statusCode)
+                        }
+                    }
                 }
             }
     }
@@ -107,15 +151,22 @@ class HTTP(
 
 
     //Main Screen
-    fun getRecommendations(){
+    fun getRecommendations(onSuccess:(res:SearchResult) -> Unit,onFailure: ()-> Unit,onNetworkError: (statusCode: Int)-> Unit){
         LOG("getting recommendations")
         Fuel.get("$baseURL/api/recommendations")
-            .responseObject<Recommendations> { _, _, result ->
+            .responseObject<SearchResult> { _, _, result ->
                 when (result) {
                     is Result.Success -> {
-                        LOG(result.value.recommendations[0].ProductName)
+                        onSuccess.invoke(result.value)
                     }
-                    is Result.Failure -> TODO()
+                    is Result.Failure -> {
+                        if(result.error.response.statusCode==406){
+                            onFailure.invoke()
+                        }
+                        else{
+                            onNetworkError.invoke(result.error.response.statusCode)
+                        }
+                    }
                 }
             }
     }
