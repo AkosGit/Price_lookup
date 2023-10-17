@@ -87,7 +87,7 @@ class HTTP(
     fun searchProductByname(productName:String, onSuccess:(res:SearchResult) -> Unit,onFailure: ()-> Unit,onNetworkError: (statusCode: Int)-> Unit){
         //returns: one image(pictures table random), prices(prices table(shop_name, price)), productname, ItemId
         LOG("sending new product: "+productName)
-        Fuel.get("$baseURL/api/product/search/byname/", listOf("productName" to productName))
+        val req=Fuel.get("$baseURL/api/product/search/byname", listOf("productName" to productName))
             .responseObject<SearchResult> { _, _, result ->
                 when (result) {
                     is Result.Success -> {

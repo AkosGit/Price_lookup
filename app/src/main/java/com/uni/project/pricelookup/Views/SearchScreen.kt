@@ -22,6 +22,7 @@ import coil.compose.AsyncImage
 import com.uni.project.pricelookup.HTTP
 import com.uni.project.pricelookup.MainActivity
 import com.uni.project.pricelookup.PreferencesManager
+import com.uni.project.pricelookup.components.NetworkError
 import com.uni.project.pricelookup.components.SearchResultList
 import com.uni.project.pricelookup.models.SearchResult
 import kotlinx.coroutines.*
@@ -40,7 +41,13 @@ fun SearchScreen(navigation: NavController, query:String?){
     val isLoaded = remember {
         mutableStateOf(false)
     }
-    var results = remember {
+    val isNetworkError = remember {
+        mutableStateOf(false)
+    }
+    val isFailed = remember {
+        mutableStateOf(false)
+    }
+    val results = remember {
         mutableStateOf<SearchResult?>(null)
     }
     val client=HTTP()
