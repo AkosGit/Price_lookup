@@ -107,7 +107,7 @@ fun ItemEditScreen(navigation: NavController) {
 
                     modifier = Modifier
                         .padding(20.dp)
-                        .height(200.dp)
+                        .height(100.dp)
                         .fillMaxWidth(),
                 )
             }
@@ -134,7 +134,7 @@ fun ItemEditScreen(navigation: NavController) {
                             Box(
                                 modifier = Modifier
                                     .width(150.dp)
-                                    .height(200.dp)
+                                    .height(100.dp)
                                     .clickable {
                                         photoMain.value = photoBarCode
                                     }
@@ -162,7 +162,7 @@ fun ItemEditScreen(navigation: NavController) {
                             Box(
                                 modifier = Modifier
                                     .width(150.dp)
-                                    .height(200.dp)
+                                    .height(100.dp)
                                     .clickable {
                                         photoMain.value = photoBarCode
                                     }

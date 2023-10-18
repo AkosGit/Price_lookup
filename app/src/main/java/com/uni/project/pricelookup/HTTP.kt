@@ -69,7 +69,7 @@ class HTTP(
                 when (result) {
                     is Result.Success -> {
                         if(productImagePath!=null){
-                            sendImage(productImagePath,result.value.ItemId,onSuccess,onFailure,onNetworkError)
+                            sendImage(productImagePath,result.value.itemId,onSuccess,onFailure,onNetworkError)
                         }
                     }
                     is Result.Failure -> {
@@ -92,7 +92,7 @@ class HTTP(
                     is Result.Success -> {
 
                         if(productImagePath!=null){
-                            sendImage(productImagePath,result.value.ItemId,onSuccess,onFailure,onNetworkError)
+                            sendImage(productImagePath,result.value.itemId,onSuccess,onFailure,onNetworkError)
                         }
                     }
                     is Result.Failure -> {
