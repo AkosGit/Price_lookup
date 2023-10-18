@@ -218,29 +218,23 @@ fun ItemEditScreen(navigation: NavController) {
             Toast.makeText(context,Error.message,Toast.LENGTH_LONG).show()
         }
 
-        Button( onClick = {
-            //val ocr=OCR()
-            //ocr.MakeOCR(photoBarCode,context,{text-> })
-            //HTTP().sendImage(photoBarCode)
-        }) {
-            Text(text = "Process barcode image")
-        }
-
-        //edit barcode details
         var visible= remember { mutableStateOf(false) }
-        Box(
-            modifier = Modifier
-                .fillMaxWidth(),
-            contentAlignment = Alignment.Center
-        )
-        {
+        Row{
+            Button( onClick = {
+                //val ocr=OCR()
+                //ocr.MakeOCR(photoBarCode,context,{text-> })
+                //HTTP().sendImage(photoBarCode)
+            }) {
+                Text(text = "Process barcode image")
+            }
+
+            //edit barcode details
             Button(onClick = { visible.value = true }) {
                 Text(text = "Edit barcode data")
             }
-        }
-        Button(onClick = {
-            CoroutineScope(Dispatchers.IO).launch {
-                client.updateProduct(detectedName.value,shop.value,detectedPrice.value,photoProduct.value, {
+            Button(onClick = {
+                CoroutineScope(Dispatchers.IO).launch {
+                    client.updateProduct(detectedName.value,shop.value,detectedPrice.value,photoProduct.value, {
                         //onSuccess
                         isLoaded.value=true
                         this.cancel("Fuck you")
@@ -253,12 +247,15 @@ fun ItemEditScreen(navigation: NavController) {
                         isNetworkError.value=true
                         this.cancel("Fuck you")
                     }
-                )
+                    )
+                }
+            }) {
+                Text(text = "UPLOAD")
             }
-        }) {
-
         }
 
+
+//        TODO: ne legyen muliline és enternél menyjen a kövire
         BottomSheet_google(detectedName,detectedPrice,visible)
         if(isNetworkError.value){
             NetworkError()
