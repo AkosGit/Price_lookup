@@ -23,7 +23,7 @@ class OCR()  {
     }
     fun TEST(context: Context){
         //val testIMG=com.uni.project.pricelookup.R.drawable.lidl_close_pricetag_other_text spar_big_pricetag
-        val testIMG=com.uni.project.pricelookup.R.drawable.spar_big_pricetag
+        val testIMG=com.uni.project.pricelookup.R.drawable.lidl_big_pricetag
         var path: Uri = Uri.parse("android.resource://com.uni.project.pricelookup/" + testIMG)
         val recognizer = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS)
         val img = InputImage.fromFilePath(context,path)
@@ -53,6 +53,67 @@ class OCR()  {
                 }
         }
     }
+
+    fun findBlockBasedOnDistance(filter:Regex,allBlocks:MutableList<TextBlock>,startPoint:TextBlock,returnSmaller:Boolean): Int {
+        //returns the index of the result
+
+        val blockDistancesByTop= mutableListOf<Int>()
+        val blockDistancesByBottom= mutableListOf<Int>()
+        for (b in allBlocks){
+            if(filter.containsMatchIn(b.text)){
+                blockDistancesByTop.add(abs(startPoint!!.lines[0]!!.boundingBox!!.top-b!!.lines[0]!!.boundingBox!!.top))
+                blockDistancesByBottom.add(abs(startPoint.lines[0].boundingBox!!.bottom-b!!.lines[0].boundingBox!!.bottom))
+            }
+
+        }
+
+        //index of min distance top/bottom neighbor
+        val minTopIndex=blockDistancesByTop.indexOf(blockDistancesByTop.min())
+        blockDistancesByBottom[minTopIndex]=10000000 //avoid choosing same element
+        val minBottomIndex=blockDistancesByBottom.indexOf(blockDistancesByBottom.min())
+
+        val minTopText=allBlocks[minTopIndex].text
+        val minBottomText=allBlocks[minBottomIndex].text
+
+
+        var Index=0
+        if( minTopText.length > minBottomText.length){
+            if(returnSmaller){
+                Index=minBottomIndex
+            }else{
+                Index=minTopIndex
+            }
+
+        }
+        else{
+            if(returnSmaller){
+                Index=minTopIndex
+            }else{
+                Index=minBottomIndex
+            }
+        }
+        return Index
+    }
+    fun removeBlocksWidthDifferentAngle(allBlocks:MutableList<TextBlock>,referenceBlock:TextBlock,ANGLE_DIFFERENCE:Int=5): MutableList<TextBlock> {
+        val notInSameAngle = Predicate<TextBlock> { b: TextBlock -> b.lines[0].angle-ANGLE_DIFFERENCE >referenceBlock!!.lines[0].angle || b.lines[0].angle+ANGLE_DIFFERENCE< referenceBlock.lines[0].angle }
+        remove(allBlocks,notInSameAngle)
+        return allBlocks
+    }
+    fun findProductNameEnd(baseName:String, productTitleIndex:Int, allBlocks: MutableList<TextBlock>,filter:Regex): String {
+        var name=baseName
+
+        if(!filter.containsMatchIn(name)){
+            var i=productTitleIndex+1
+            while (i<allBlocks.size){
+                name=name+" "+allBlocks[i].text
+                if(filter.containsMatchIn(allBlocks[i].text)){
+                    return name
+                }
+                i++
+            }
+        }
+        return name
+    }
     private fun ProcessResult(context: Context,result:Text,SuccesOCR: (Text:Text)-> Unit){
         val blocks=result.textBlocks;
         //TODO: if ft+price in the same block cant be found search for price block close to ft
@@ -62,66 +123,55 @@ class OCR()  {
         //search for block that has currency in it rest will go to AllBlocks
         var currency:Int=0
         var isFT=false
-        var ftBlock:TextBlock?=null
+        var ftBlock:TextBlock?=null //only used if FT+currency not in one block
         for (b in blocks){
+
             val text=b.text.uppercase()
             AllBlocks.add(b)
+
             if(text.contains("FT") && !isFT){
                 isFT=true
                 ftBlock=b
             }
-            if(currencyregex.containsMatchIn(text)){
-                if(currency==0){ //grab frist price block because irs scanning from the top to the bottom
+
+            if(currencyregex.containsMatchIn(text)){//matches curreny+FT
+                if(currency==0){ //grab frist price block because it's scanning from the top to the bottom
                     currentBlock=b
                     currency= currencyregex.find(currentBlock.text.uppercase())!!.groups[1]!!.value.toInt()
                 }
                 AllBlocks.remove(b) //remove all currency blocks
             }
         }
-        //if no blocks can be found with curreny+FT, merge FT+currency
+        //if no blocks can be found with curreny+FT, search for them seperetly
         if(currentBlock==null && isFT){
-            //search for num
+            AllBlocks.remove(ftBlock)
+
+            AllBlocks=removeBlocksWidthDifferentAngle(AllBlocks,ftBlock!!)
+
+            //currency should be close to FT block
+            val onlyNumberRegex=Regex("^\\d+\$")
+            val priceIndex=findBlockBasedOnDistance(onlyNumberRegex,AllBlocks,ftBlock!!,true)
+            currency=AllBlocks[priceIndex].text.replace("\n","").toInt()
+            currentBlock=AllBlocks[priceIndex]
+        }
+        else{
+            AllBlocks=removeBlocksWidthDifferentAngle(AllBlocks,currentBlock!!)
         }
 
-
-        //remove blocks that have very different text angle to the currency block
-        val ANGLE_DIFFERENCE=5
-        val notInSameAngle = Predicate<TextBlock> { b: TextBlock -> b.lines[0].angle-ANGLE_DIFFERENCE >currentBlock!!.lines[0].angle || b.lines[0].angle+ANGLE_DIFFERENCE< currentBlock.lines[0].angle }
-        remove(AllBlocks,notInSameAngle)
+        //TODO: separate barcode from other parts of the image
+        //1. find all colors on currency block, create a list
+        //2. if they match 80% of color of the block belongs price tag
 
 
         //remove blocks that have 3 letters or fewer
-        val threeCharactersOrMore=Regex(".*\\D{3}.*")
         val isGramInIt=Regex("\\d{2}\\s?g|\\d{2}\\s?G")
+        val threeCharactersOrMore=Regex(".*\\D{3}.*")
         val NotThreeCharactersOrMore = Predicate<TextBlock> { b: TextBlock -> !threeCharactersOrMore.containsMatchIn(b.text.replace(" ","")) && !isGramInIt.containsMatchIn(b.text) }
         remove(AllBlocks,NotThreeCharactersOrMore)
+
         //lines that are closest in the img to the currency line, one of them is the title
-        val blockDistancesByTop= mutableListOf<Int>()
-        val blockDistancesByBottom= mutableListOf<Int>()
-        for (b in AllBlocks){
-            blockDistancesByTop.add(abs(currentBlock!!.lines[0]!!.boundingBox!!.top-b!!.lines[0]!!.boundingBox!!.top))
-            blockDistancesByBottom.add(abs(currentBlock.lines[0].boundingBox!!.bottom-b!!.lines[0].boundingBox!!.bottom))
-        }
-
-
-        //index of min distance top/bottom neighbor
-        val minTopIndex=blockDistancesByTop.indexOf(blockDistancesByTop.min())
-        blockDistancesByBottom[minTopIndex]=10000000 //avoid choosing same element
-        val minBottomIndex=blockDistancesByBottom.indexOf(blockDistancesByBottom.min())
-
-        val minTopText=AllBlocks[minTopIndex].text
-        val minBottomText=AllBlocks[minBottomIndex].text
-
-
-        var productTitleIndex=0
-        var productTitle=""
-        if( minTopText.length > minBottomText.length){
-            productTitleIndex=minTopIndex
-        }
-        else{
-            productTitleIndex=minBottomIndex
-        }
-        productTitle=AllBlocks[productTitleIndex].text.replace("\n","")
+        val productTitleIndex=findBlockBasedOnDistance(Regex(".*"),AllBlocks,currentBlock!!,false)
+        var productTitle=AllBlocks[productTitleIndex].text.replace("\n","")
 
 
         //if previous block have 3 characters atleast they are part of the title
@@ -132,18 +182,8 @@ class OCR()  {
             }
         }
 
-        //the xxxg text is the last part of title, so every block should be added to the title until gram can be found
-        if(!isGramInIt.containsMatchIn(productTitle)){
-            var i=productTitleIndex+1
-            var found=false
-            while (!found && i<AllBlocks.size){
-                productTitle=productTitle+" "+AllBlocks[i].text
-                if(isGramInIt.containsMatchIn(AllBlocks[i].text)){
-                    found=true
-                }
-                i++
-            }
-        }
+        //the xxxg text is the last part of title if it exists, so every block should be added to the title until gram can be found
+        productTitle=findProductNameEnd(productTitle,productTitleIndex,AllBlocks,isGramInIt)
 
         Toast.makeText(context,productTitle,Toast.LENGTH_LONG).show()
 
