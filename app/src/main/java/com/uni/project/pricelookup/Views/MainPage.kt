@@ -74,7 +74,6 @@ fun MainPage(navigation: NavController) {
                     .padding(start = 6.dp, top = 10.dp, end = 6.dp),
                 fontWeight = Bold
             )
-            //TODO: display base picture
             if(isLoaded.value){
                 PhotoGrid(recommendedItems = results.value!!,navigation)
             }

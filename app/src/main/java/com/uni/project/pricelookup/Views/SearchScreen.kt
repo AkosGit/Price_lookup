@@ -27,6 +27,11 @@ import com.uni.project.pricelookup.components.SearchResultList
 import com.uni.project.pricelookup.models.SearchResult
 import kotlinx.coroutines.*
 
+//TODO
+// a képek nem ugyanakkorák, ezt eg kéne oldani
+//  - néhány kép nem tölti be teljesen a kívánt Boxot
+//  - néhány kép kisebb mint kellene
+
 @OptIn(DelicateCoroutinesApi::class)
 @SuppressLint("CoroutineCreationDuringComposition")
 @Composable

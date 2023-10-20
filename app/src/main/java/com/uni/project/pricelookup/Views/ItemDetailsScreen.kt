@@ -41,6 +41,9 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.items
 
+//TODO
+// úgy kb mindent javítani kellene
+
 @SuppressLint("CoroutineCreationDuringComposition")
 @OptIn(ExperimentalComposeUiApi::class, ExperimentalEncodingApi::class)
 @Composable

@@ -4,6 +4,7 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
@@ -11,6 +12,7 @@ import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
@@ -93,6 +95,7 @@ class MainActivity : ComponentActivity() {
             else -> requestPermissionLauncher.launch(Manifest.permission.CAMERA)
         }
     }
+    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     private fun getOutputDirectory(): File {
         val mediaDir = externalMediaDirs.firstOrNull()?.let {
             File(it, resources.getString(R.string.app_name)).apply { mkdirs() }
@@ -114,7 +117,7 @@ class MainActivity : ComponentActivity() {
         requestCameraPermission()
         setContent {
             PriceLookupTheme {
-                OCR().TEST(LocalContext.current)
+//                OCR().TEST(LocalContext.current)
                 ///HTTP().getAllImagesByItemId(1)
                 //saving output dir for saving files
                 val context=LocalContext.current

@@ -25,6 +25,7 @@ import kotlin.io.encoding.ExperimentalEncodingApi
 @OptIn(ExperimentalEncodingApi::class)
 @Composable
 fun ProductPreviewCard(photo:Int = R.drawable.chocolate_bar1, navigation: NavController?,item:Product?) {
+    //TODO: display base picture
     val decodedString = item?.Pictures?.get(0)?.let { Base64.decode(it.image, 0) }
     val bitmap= BitmapFactory.decodeByteArray(decodedString, 0, decodedString!!.size)
     ElevatedCard(

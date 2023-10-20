@@ -79,7 +79,8 @@ fun ItemEditScreen(navigation: NavController) {
     }
 
     Column(
-
+//TODO
+// basically megcsinálni egy carouselt, ahol a két kép között lehet scrollolni
         Modifier.onFocusChanged {
             val photoLocProduct = preferencesManager.getData("product", "")
             if (photoLocProduct != "") {
@@ -229,6 +230,8 @@ fun ItemEditScreen(navigation: NavController) {
             }
 
             //edit barcode details
+            //TODO
+            // ezt a részt egy kicsit renbeszedni kinézetileg
             Button(onClick = { visible.value = true }) {
                 Text(text = "Edit barcode data")
             }

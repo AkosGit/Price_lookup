@@ -157,6 +157,8 @@ fun CameraCapture(
             }
         )
         if(IsPhototaken.value=="yes"){
+//TODO
+// kicsit rendbeszedni
             Column(
                 modifier = Modifier.fillMaxSize()
                     .background(MaterialTheme.colorScheme.background)
@@ -178,7 +180,6 @@ fun CameraCapture(
                 }) {//replace with icon
                     Text(text = "Retry")
                 }
-
             }
         }
     }
