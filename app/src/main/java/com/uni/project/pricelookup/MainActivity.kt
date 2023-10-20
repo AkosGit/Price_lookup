@@ -117,7 +117,7 @@ class MainActivity : ComponentActivity() {
         requestCameraPermission()
         setContent {
             PriceLookupTheme {
-//                OCR().TEST(LocalContext.current)
+                OCR().TEST(LocalContext.current)
                 ///HTTP().getAllImagesByItemId(1)
                 //saving output dir for saving files
                 val context=LocalContext.current

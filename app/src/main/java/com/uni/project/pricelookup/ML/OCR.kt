@@ -1,18 +1,18 @@
 package com.uni.project.pricelookup.ML
 
 import android.content.Context
+import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import android.graphics.drawable.BitmapDrawable
-import android.graphics.drawable.Drawable
+import android.graphics.Color
 import android.net.Uri
 import android.widget.Toast
 import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.text.Text
-import com.google.mlkit.vision.text.Text.Line
 import com.google.mlkit.vision.text.Text.TextBlock
 import com.google.mlkit.vision.text.TextRecognition
 import com.google.mlkit.vision.text.latin.TextRecognizerOptions
 import java.io.File
+import java.math.BigDecimal
 import java.util.function.Predicate
 import kotlin.math.abs
 
@@ -23,13 +23,17 @@ class OCR()  {
     }
     fun TEST(context: Context){
         //val testIMG=com.uni.project.pricelookup.R.drawable.lidl_close_pricetag_other_text spar_big_pricetag
-        val testIMG=com.uni.project.pricelookup.R.drawable.lidl_big_pricetag
+        val testIMG=com.uni.project.pricelookup.R.drawable.lidl_close_pricetag_other_text
         var path: Uri = Uri.parse("android.resource://com.uni.project.pricelookup/" + testIMG)
         val recognizer = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS)
         val img = InputImage.fromFilePath(context,path)
+        val bitmap = BitmapFactory.decodeResource(
+            context.resources,
+            testIMG
+        )
         val result = recognizer.process(img)
             .addOnSuccessListener { visionText ->
-                ProcessResult(context,visionText, {})
+                ProcessResult(context,visionText,{},bitmap)
             }
     }
     fun MakeOCR(ImagePath:String,context:Context,SuccesOCR: (Text:Text)-> Unit){
@@ -46,7 +50,7 @@ class OCR()  {
             val img = InputImage.fromBitmap(bitmap, 0)
             val result = recognizer.process(img)
                 .addOnSuccessListener { visionText ->
-                    ProcessResult(context,visionText, SuccesOCR)
+                    ProcessResult(context,visionText, SuccesOCR,bitmap)
                 }
                 .addOnFailureListener { e ->
                     Toast.makeText(context, e.message, Toast.LENGTH_LONG).show()
@@ -94,6 +98,82 @@ class OCR()  {
         }
         return Index
     }
+    class RGBColor(
+        val red:Int,
+        val green:Int,
+        val blue:Int
+    )
+    fun getImageColors(bitmap: Bitmap): List<RGBColor> {
+        var colors:MutableList<RGBColor> = mutableListOf()
+        var previusColor: RGBColor? =null
+        var isSimilar=false
+        for (y in 0 until bitmap.height) {
+            for (x in 0 until bitmap.width) {
+                isSimilar=false
+                val color: Int = bitmap.getColor(x, y).toArgb()
+                val red: Int = Color.red(color)
+                val green: Int = Color.green(color)
+                val blue: Int = Color.blue(color)
+                //val alpha: Int = Color.alpha(color)
+                val colorOBJ=RGBColor(red=red,green=green,blue=blue)
+                if(previusColor!=null){
+                    val c=isColorSimilar(mutableListOf(colorOBJ),previusColor)
+                    if(c==null){
+                        colors.add(colorOBJ)
+                        isSimilar=true
+                    }
+                }
+                previusColor=colorOBJ
+            }
+        }
+        return colors
+    }
+    fun reduceColors(colors: List<RGBColor>): MutableList<RGBColor> {
+        val reducedColors:MutableList<RGBColor> = colors.toMutableList()
+        for (color in colors){
+            val isSimilarColorInIt = Predicate<RGBColor> { c: RGBColor ->
+                val similar=isColorSimilar(reducedColors,c)
+                if(similar==null) {
+                    return@Predicate false
+                }
+                return@Predicate true
+            }
+            remove(reducedColors,isSimilarColorInIt)
+        }
+        return reducedColors
+    }
+    fun isColorSimilar(original: List<RGBColor>,color: RGBColor): RGBColor? {
+        val MATCH_ERROR=3
+        for (origColor in original) {
+            //if two channels match
+            if (color.red== origColor.red && color.green == origColor.green && color.blue==origColor.blue) {
+                return color
+            } else if (color.blue == origColor.blue && color.red == origColor.red) {
+                if (abs(color.green - origColor.green) < MATCH_ERROR || abs(origColor.green - color.green) < MATCH_ERROR) {
+                    return color
+                }
+            } else if (color.blue == origColor.blue && color.green == origColor.green) {
+                if (abs(color.red - origColor.red) < MATCH_ERROR || abs(origColor.red - color.red) < MATCH_ERROR) {
+                    return color
+                }
+            } else if (color.red == origColor.red && color.green == origColor.green) {
+                if (abs(color.blue - origColor.blue) < MATCH_ERROR || abs(origColor.blue - color.blue) < MATCH_ERROR) {
+                    return color
+                }
+            }
+        }
+        return null
+    }
+    fun compareColorList(original: List<RGBColor>, against: List<RGBColor>): Float {
+        val matchList:MutableList<Boolean> = mutableListOf()
+        for(color in against){
+            val match= isColorSimilar(original,color)
+            if(match!=null){
+                matchList.add(true)
+            }
+        }
+        return matchList.size.toFloat() / against.size.toFloat()
+    }
     fun removeBlocksWidthDifferentAngle(allBlocks:MutableList<TextBlock>,referenceBlock:TextBlock,ANGLE_DIFFERENCE:Int=5): MutableList<TextBlock> {
         val notInSameAngle = Predicate<TextBlock> { b: TextBlock -> b.lines[0].angle-ANGLE_DIFFERENCE >referenceBlock!!.lines[0].angle || b.lines[0].angle+ANGLE_DIFFERENCE< referenceBlock.lines[0].angle }
         remove(allBlocks,notInSameAngle)
@@ -114,7 +194,7 @@ class OCR()  {
         }
         return name
     }
-    private fun ProcessResult(context: Context,result:Text,SuccesOCR: (Text:Text)-> Unit){
+    private fun ProcessResult(context: Context,result:Text,SuccesOCR: (Text:Text)-> Unit,bitmap: Bitmap){
         val blocks=result.textBlocks;
         //TODO: if ft+price in the same block cant be found search for price block close to ft
         var currentBlock:TextBlock? = null
@@ -161,6 +241,35 @@ class OCR()  {
         //TODO: separate barcode from other parts of the image
         //1. find all colors on currency block, create a list
         //2. if they match 80% of color of the block belongs price tag
+        val currentBlockBitmap: Bitmap = Bitmap.createBitmap(
+            bitmap,
+            currentBlock.boundingBox!!.bottom,
+            currentBlock.boundingBox!!.top,
+            currentBlock.boundingBox!!.width(),
+            currentBlock.boundingBox!!.height()
+        )
+        var currentBlockColors=getImageColors(currentBlockBitmap)
+        //currentBlockColors=reduceColors(currentBlockColors)
+
+        val differentColor = Predicate<TextBlock> { b:TextBlock ->
+            val blockBitmap: Bitmap = Bitmap.createBitmap(
+                bitmap,
+                b.boundingBox!!.bottom,
+                b.boundingBox!!.top,
+                b.boundingBox!!.width(),
+                b.boundingBox!!.height()
+            )
+            var blockColors=getImageColors(blockBitmap)
+            //blockColors=reduceColors(blockColors)
+            val matchPercentage=compareColorList(currentBlockColors,blockColors)
+            if(matchPercentage< 0.6.toFloat()){
+                return@Predicate true
+            }
+            return@Predicate false
+        }
+        remove(AllBlocks,differentColor)
+
+
 
 
         //remove blocks that have 3 letters or fewer
