@@ -256,8 +256,11 @@ class MainActivity : ComponentActivity() {
                                                     )
                                                 },
                                         ){
-                                            //TODO: search not showing on ItemDetailsScreen
-                                            if(NavigationState.value?.destination ==navController.findDestination("SearchScreen") || NavigationState.value?.destination==navController.findDestination("MainPage") || NavigationState.value?.destination==navController.findDestination("ItemDetailsScreen")){
+                                            if(
+                                                NavigationState.value?.destination ==navController.findDestination("SearchScreen/{query}")
+                                                || NavigationState.value?.destination==navController.findDestination("MainPage")
+                                                || NavigationState.value?.destination==navController.findDestination("ItemDetailsScreen/{query}")
+                                            ){
                                                 SearchWidget(
                                                     text = searchText.value,
                                                     onTextChange = {
