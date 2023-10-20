@@ -23,7 +23,7 @@ class OCR()  {
     }
     fun TEST(context: Context){
         //val testIMG=com.uni.project.pricelookup.R.drawable.lidl_close_pricetag_other_text spar_big_pricetag
-        val testIMG=com.uni.project.pricelookup.R.drawable.lidl_close_pricetag_other_text
+        val testIMG=com.uni.project.pricelookup.R.drawable.dm
         var path: Uri = Uri.parse("android.resource://com.uni.project.pricelookup/" + testIMG)
         val recognizer = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS)
         val img = InputImage.fromFilePath(context,path)
@@ -142,23 +142,46 @@ class OCR()  {
         }
         return reducedColors
     }
-    fun isColorSimilar(original: List<RGBColor>,color: RGBColor): RGBColor? {
-        val MATCH_ERROR=3
+    fun isColorSimilar(original: List<RGBColor>,color: RGBColor,MATCH_ERROR:Int=3): RGBColor? {
         for (origColor in original) {
             //if two channels match
             if (color.red== origColor.red && color.green == origColor.green && color.blue==origColor.blue) {
                 return color
-            } else if (color.blue == origColor.blue && color.red == origColor.red) {
+            }
+            if (color.blue == origColor.blue && color.red == origColor.red) {
                 if (abs(color.green - origColor.green) < MATCH_ERROR || abs(origColor.green - color.green) < MATCH_ERROR) {
                     return color
                 }
-            } else if (color.blue == origColor.blue && color.green == origColor.green) {
+            }
+            if (color.blue == origColor.blue && color.green == origColor.green) {
                 if (abs(color.red - origColor.red) < MATCH_ERROR || abs(origColor.red - color.red) < MATCH_ERROR) {
                     return color
                 }
-            } else if (color.red == origColor.red && color.green == origColor.green) {
+            }
+            if (color.red == origColor.red && color.green == origColor.green) {
                 if (abs(color.blue - origColor.blue) < MATCH_ERROR || abs(origColor.blue - color.blue) < MATCH_ERROR) {
                     return color
+                }
+            }
+            if(color.red==origColor.red){
+                if (abs(color.blue - origColor.blue) < MATCH_ERROR || abs(origColor.blue - color.blue) < MATCH_ERROR) {
+                    if (abs(color.green - origColor.green) < MATCH_ERROR || abs(origColor.green - color.green) < MATCH_ERROR) {
+                        return color
+                    }
+                }
+            }
+            if(color.blue==origColor.blue){
+                if (abs(color.red - origColor.red) < MATCH_ERROR || abs(origColor.red - color.red) < MATCH_ERROR) {
+                    if (abs(color.green - origColor.green) < MATCH_ERROR || abs(origColor.green - color.green) < MATCH_ERROR) {
+                        return color
+                    }
+                }
+            }
+            if(color.green==origColor.green){
+                if (abs(color.blue - origColor.blue) < MATCH_ERROR || abs(origColor.blue - color.blue) < MATCH_ERROR) {
+                    if (abs(color.red - origColor.red) < MATCH_ERROR || abs(origColor.red - color.red) < MATCH_ERROR) {
+                        return color
+                    }
                 }
             }
         }
@@ -167,7 +190,7 @@ class OCR()  {
     fun compareColorList(original: List<RGBColor>, against: List<RGBColor>): Float {
         val matchList:MutableList<Boolean> = mutableListOf()
         for(color in against){
-            val match= isColorSimilar(original,color)
+            val match= isColorSimilar(original,color,12)
             if(match!=null){
                 matchList.add(true)
             }
