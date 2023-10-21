@@ -6,13 +6,17 @@ import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.net.Uri
 import android.widget.Toast
+import com.google.mlkit.common.model.LocalModel
 import com.google.mlkit.vision.common.InputImage
+import com.google.mlkit.vision.objects.DetectedObject
+import com.google.mlkit.vision.objects.ObjectDetection
+import com.google.mlkit.vision.objects.custom.CustomObjectDetectorOptions
+import com.google.mlkit.vision.objects.defaults.ObjectDetectorOptions
 import com.google.mlkit.vision.text.Text
 import com.google.mlkit.vision.text.Text.TextBlock
 import com.google.mlkit.vision.text.TextRecognition
 import com.google.mlkit.vision.text.latin.TextRecognizerOptions
 import java.io.File
-import java.math.BigDecimal
 import java.util.function.Predicate
 import kotlin.math.abs
 
@@ -23,7 +27,7 @@ class OCR()  {
     }
     fun TEST(context: Context){
         //val testIMG=com.uni.project.pricelookup.R.drawable.lidl_close_pricetag_other_text spar_big_pricetag
-        val testIMG=com.uni.project.pricelookup.R.drawable.dm
+        val testIMG=com.uni.project.pricelookup.R.drawable.spar_some_text
         var path: Uri = Uri.parse("android.resource://com.uni.project.pricelookup/" + testIMG)
         val recognizer = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS)
         val img = InputImage.fromFilePath(context,path)
@@ -33,7 +37,8 @@ class OCR()  {
         )
         val result = recognizer.process(img)
             .addOnSuccessListener { visionText ->
-                ProcessResult(context,visionText,{},bitmap)
+                detectObjects(bitmap,visionText,context)
+                //ProcessResult(context,visionText,{},bitmap)
             }
     }
     fun MakeOCR(ImagePath:String,context:Context,SuccesOCR: (Text:Text)-> Unit){
@@ -50,12 +55,60 @@ class OCR()  {
             val img = InputImage.fromBitmap(bitmap, 0)
             val result = recognizer.process(img)
                 .addOnSuccessListener { visionText ->
-                    ProcessResult(context,visionText, SuccesOCR,bitmap)
+                    detectObjects(bitmap,visionText,context)
+                    //ProcessResult(context,visionText, SuccesOCR,bitmap)
                 }
                 .addOnFailureListener { e ->
                     Toast.makeText(context, e.message, Toast.LENGTH_LONG).show()
                 }
         }
+    }
+    fun detectObjects(bitmap: Bitmap,text: Text,context: Context){
+        val blocks=text.textBlocks;
+        val inObjectBlocks= emptyMap<DetectedObject,MutableList<TextBlock>>().toMutableMap()
+        /*val options = ObjectDetectorOptions.Builder()
+            .setDetectorMode(ObjectDetectorOptions.SINGLE_IMAGE_MODE)
+            .enableMultipleObjects()
+            .enableClassification()  // Optional
+            .build()*/
+        val localModel = LocalModel.Builder()
+            .setAssetFilePath("resnet_v2_101_1_metadata_1.tflite")
+            // or .setAbsoluteFilePath(absolute file path to model file)
+            // or .setUri(URI to model file)
+            .build()
+        //val objectDetector = ObjectDetection.getClient(options)
+        val image = InputImage.fromBitmap(bitmap, 0)
+        val customObjectDetectorOptions =
+            CustomObjectDetectorOptions.Builder(localModel)
+                .setDetectorMode(CustomObjectDetectorOptions.SINGLE_IMAGE_MODE)
+                .enableMultipleObjects()
+                .enableClassification()
+                .setClassificationConfidenceThreshold(0.4f)
+                .setMaxPerObjectLabelCount(4)
+                .build()
+        val objectDetector =
+            ObjectDetection.getClient(customObjectDetectorOptions)
+        val TEXTBOX_ERROR_TOLLERANCE=3
+        objectDetector.process(image)
+            .addOnSuccessListener { detectedObjects ->
+                for (obj in detectedObjects){
+                    for(block in blocks){
+                        if(obj.boundingBox.contains(block.boundingBox!!.left-TEXTBOX_ERROR_TOLLERANCE, block.boundingBox!!.top-TEXTBOX_ERROR_TOLLERANCE,block.boundingBox!!.right-TEXTBOX_ERROR_TOLLERANCE,block.boundingBox!!.bottom-TEXTBOX_ERROR_TOLLERANCE)) {
+                            if(inObjectBlocks[obj]==null){
+                                inObjectBlocks[obj] = mutableListOf()
+                            }
+                            else{
+                                inObjectBlocks[obj]!!.add(block)
+                            }
+                        }
+                    }
+                }
+                ProcessResult(context,inObjectBlocks,{},bitmap)
+            }
+            .addOnFailureListener { e ->
+                // Task failed with an exception
+                // ...
+            }
     }
 
     fun findBlockBasedOnDistance(filter:Regex,allBlocks:MutableList<TextBlock>,startPoint:TextBlock,returnSmaller:Boolean): Int {
@@ -217,32 +270,48 @@ class OCR()  {
         }
         return name
     }
-    private fun ProcessResult(context: Context,result:Text,SuccesOCR: (Text:Text)-> Unit,bitmap: Bitmap){
-        val blocks=result.textBlocks;
+    fun findCorrectObj(result: MutableMap<DetectedObject, MutableList<TextBlock>>): DetectedObject? {
+        for (obj in result.keys){
+            for(b in result[obj]!!){
+                if(b.text.uppercase().contains("FT")){
+                    return obj
+                }
+            }
+        }
+        return null
+    }
+    private fun ProcessResult(
+        context: Context,
+        result: MutableMap<DetectedObject, MutableList<TextBlock>>,
+        SuccesOCR: (Text:Text)-> Unit,
+        bitmap: Bitmap){
         //TODO: if ft+price in the same block cant be found search for price block close to ft
         var currentBlock:TextBlock? = null
         val currencyregex = Regex("(\\d+)\\D*FT")
-        var AllBlocks= mutableListOf<TextBlock>() //first it will contain all blocks which are not currency related than it will be filtered to search for product
+        val blocks=result[findCorrectObj(result)]
+        var AllBlocks= mutableListOf<TextBlock>()  //first it will contain all blocks which are not currency related than it will be filtered to search for product
         //search for block that has currency in it rest will go to AllBlocks
         var currency:Int=0
         var isFT=false
         var ftBlock:TextBlock?=null //only used if FT+currency not in one block
-        for (b in blocks){
+        if (blocks != null) {
+            for (b in blocks){
 
-            val text=b.text.uppercase()
-            AllBlocks.add(b)
+                val text=b.text.uppercase()
+                AllBlocks.add(b)
 
-            if(text.contains("FT") && !isFT){
-                isFT=true
-                ftBlock=b
-            }
-
-            if(currencyregex.containsMatchIn(text)){//matches curreny+FT
-                if(currency==0){ //grab frist price block because it's scanning from the top to the bottom
-                    currentBlock=b
-                    currency= currencyregex.find(currentBlock.text.uppercase())!!.groups[1]!!.value.toInt()
+                if(text.contains("FT") && !isFT){
+                    isFT=true
+                    ftBlock=b
                 }
-                AllBlocks.remove(b) //remove all currency blocks
+
+                if(currencyregex.containsMatchIn(text)){//matches curreny+FT
+                    if(currency==0){ //grab frist price block because it's scanning from the top to the bottom
+                        currentBlock=b
+                        currency= currencyregex.find(currentBlock.text.uppercase())!!.groups[1]!!.value.toInt()
+                    }
+                    AllBlocks.remove(b) //remove all currency blocks
+                }
             }
         }
         //if no blocks can be found with curreny+FT, search for them seperetly
@@ -261,6 +330,7 @@ class OCR()  {
             AllBlocks=removeBlocksWidthDifferentAngle(AllBlocks,currentBlock!!)
         }
 
+        /*
         //TODO: separate barcode from other parts of the image
         //1. find all colors on currency block, create a list
         //2. if they match 80% of color of the block belongs price tag
@@ -291,6 +361,8 @@ class OCR()  {
             return@Predicate false
         }
         remove(AllBlocks,differentColor)
+        */
+
 
 
 
@@ -322,6 +394,6 @@ class OCR()  {
         //line that has similar text to product img text
         //TODO: is good idea?
 
-        }
-
     }
+
+}
