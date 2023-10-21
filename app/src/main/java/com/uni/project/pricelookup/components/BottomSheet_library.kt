@@ -41,7 +41,7 @@ fun BottomSheet_google(detectedName: MutableState<String>, detectedPrice:Mutable
                         text = "Detected product name:",
 
                         )
-                    TextField(value = detectedName.value, onValueChange = { detectedName.value = it })
+                    TextField(singleLine = true, value = detectedName.value, onValueChange = { detectedName.value = it })
                 }
                 Row(
 
@@ -50,6 +50,7 @@ fun BottomSheet_google(detectedName: MutableState<String>, detectedPrice:Mutable
                         text = "Detected price:",
                     )
                     TextField(
+                        singleLine = true,
                         value = priceString.value,
                         onValueChange = {
                             if(it==""){

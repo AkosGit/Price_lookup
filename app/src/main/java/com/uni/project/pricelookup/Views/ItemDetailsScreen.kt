@@ -43,6 +43,7 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
+import com.uni.project.pricelookup.MainActivity
 import com.uni.project.pricelookup.components.CouponShapeLeftSide
 import com.uni.project.pricelookup.components.CouponShapeRightSide
 import java.time.format.DateTimeFormatter
@@ -64,6 +65,7 @@ fun displayDate(dateFromDb: Date): String{
 @Composable
 fun ItemDetailsScreen(navigation: NavController,itemId:String?) {
     val context = LocalContext.current
+    MainActivity.CleanUpImages(context)
     val isLoaded = remember {
         mutableStateOf(false)
     }
@@ -76,7 +78,7 @@ fun ItemDetailsScreen(navigation: NavController,itemId:String?) {
     val product = remember {
         mutableStateOf<Product?>(null)
     }
-    val client= HTTP()
+    val client= HTTP(LocalContext.current)
     CoroutineScope(Dispatchers.IO).launch {
         client.getProduct(ItemId = itemId!!,{
                 //onSuccess

@@ -39,7 +39,7 @@ fun MainPage(navigation: NavController) {
     val results = remember {
         mutableStateOf<SearchResult?>(null)
     }
-    val client= HTTP()
+    val client= HTTP(LocalContext.current)
     CoroutineScope(Dispatchers.IO).launch {
         client.getRecommendations({
                 //onSuccess

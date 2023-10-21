@@ -55,7 +55,7 @@ fun SearchScreen(navigation: NavController, query:String?){
     val results = remember {
         mutableStateOf<SearchResult?>(null)
     }
-    val client=HTTP()
+    val client=HTTP(LocalContext.current)
     CoroutineScope(Dispatchers.IO).launch {
         client.searchProductByname(
             query!!,{

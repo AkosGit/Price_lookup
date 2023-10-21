@@ -1,6 +1,8 @@
 package com.uni.project.pricelookup
 
+import android.content.Context
 import android.util.Log
+import androidx.compose.runtime.remember
 import com.github.kittinunf.fuel.Fuel
 import com.github.kittinunf.fuel.core.FileDataPart
 import com.github.kittinunf.fuel.core.Method
@@ -10,9 +12,13 @@ import com.github.kittinunf.result.Result
 import com.uni.project.pricelookup.models.*
 
 class HTTP(
-//    var baseURL:String = "http://192.168.0.235:3000" //akos
-    var baseURL:String = "http://192.168.0.184:3000"   //csabi
+    context: Context
 ) {
+    val preferencesManager = PreferencesManager(context)
+    //var baseURL:String = "http://192.168.0.235:3000" //akos
+    var baseURL:String = "http://192.168.0.184:3000"   //csabi
+    //var baseURL:String = "http://${preferencesManager.getData("SERVER_URL","")}:3000" //from settings
+
     private fun LOG(msg:String){
         Log.i("SEND_HTTP",msg)
     }
