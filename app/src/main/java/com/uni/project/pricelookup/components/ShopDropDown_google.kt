@@ -1,5 +1,6 @@
 package com.uni.project.pricelookup.components
 
+import android.graphics.Bitmap
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -23,7 +24,7 @@ fun ShopDropDown_google(shop: MutableState<String>){
     val isExpanded= remember {
         mutableStateOf(false)
     }
-    val shops = listOf("Spar","Lidl","Aldi","Auchan")
+    val shops : MutableList<String> = mutableListOf("Spar","Lidl","Aldi","Auchan")
     var dropDownWidth by remember {
         mutableStateOf(0)
     }

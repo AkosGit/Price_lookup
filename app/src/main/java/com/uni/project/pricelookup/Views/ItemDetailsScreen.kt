@@ -125,30 +125,46 @@ fun ItemDetailsScreen(navigation: NavController,itemId:String?) {
                 val pagerState = rememberPagerState(
                     pageCount = { bitmapList.size }
                 )
-                val currentIndex = remember { mutableStateOf(1)}
                 HorizontalPager(
                     state = pagerState,
                     key = null,
                 ){
                     index ->
-                    currentIndex.value = bitmapList.indexOf(bitmapList[index])
-                    AsyncImage(
-                        model = bitmapList[index],
-                        contentDescription = null,
-                        contentScale = ContentScale.Crop,
+                    Box(
+                        contentAlignment = Alignment.BottomCenter,
                         modifier = Modifier
                             .fillMaxSize()
-                            .padding(start = 10.dp, end = 10.dp)
-                            .clip(
-                                shape = RoundedCornerShape(
-                                    topStart = 20.dp,
-                                    topEnd = 20.dp
+                            .background(Color.Transparent)
+                    ){
+                        AsyncImage(
+                            model = bitmapList[index],
+                            contentDescription = null,
+                            contentScale = ContentScale.Crop,
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(start = 10.dp, end = 10.dp)
+                                .clip(
+                                    shape = RoundedCornerShape(
+                                        topStart = 20.dp,
+                                        topEnd = 20.dp
+                                    )
                                 )
-                            )
-                        ,
-                    )
+                            ,
+                        )
+                        Box(
+                            contentAlignment = Alignment.BottomEnd,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(bottom = 10.dp, end = 20.dp)
+                                .alpha(20f)
+                        ){
+                            Text(text = "${pagerState.currentPage+1}/${bitmapList.count()}")
+                        }
+                    }
                 }
 //                TODO - ha ilyet szeretnénk, ezen optimalizálni kell, mert gusztustalanul akad tőle az app
+//                  sajnos ha a Pager Componentent kívül van, a pagerState.currentPage laggot okoz lépváltás közben :(
+//                  Ha találok rá más megoldást, be lehet implementálni, de addig counter marad
 //                Row(
 //                    Modifier
 //                        .height(50.dp)
@@ -169,19 +185,7 @@ fun ItemDetailsScreen(navigation: NavController,itemId:String?) {
 //                    }
 //                }
 
-                Box(
-                    contentAlignment = Alignment.BottomCenter,
-                    modifier = Modifier
-                        .fillMaxSize()
-                ){
-                    Box(contentAlignment = Alignment.BottomEnd, modifier = Modifier.fillMaxWidth().padding(bottom = 10.dp, end = 20.dp)){
-                        Button(enabled = false, modifier = Modifier.alpha(20f), onClick = { /*not needed*/ }, shape = RoundedCornerShape(20.dp),
-                            content = {
-                                Text(text = "${pagerState.currentPage+1}/${bitmapList.count()}")
-                            },
-                        )
-                    }
-                }
+
             }
 
             //Title

@@ -1,12 +1,19 @@
 package com.uni.project.pricelookup.Views
 
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.widget.Toast
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -27,17 +34,20 @@ import com.uni.project.pricelookup.components.BottomSheet_google
 import com.uni.project.pricelookup.components.ShopDropDown_google
 import eu.wewox.modalsheet.ExperimentalSheetApi
 import kotlinx.coroutines.*
-import androidx.compose.material.icons.rounded.CameraEnhance
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import com.google.mlkit.vision.text.Text
 import com.uni.project.pricelookup.HTTP
 import com.uni.project.pricelookup.R
 import com.uni.project.pricelookup.components.NetworkError
 import com.uni.project.pricelookup.models.SearchResult
+import kotlin.io.encoding.Base64
 
 @OptIn(ExperimentalComposeUiApi::class, ExperimentalMaterialApi::class, ExperimentalMaterial3Api::class,
-    DelicateCoroutinesApi::class, ExperimentalSheetApi::class
+    DelicateCoroutinesApi::class, ExperimentalSheetApi::class, ExperimentalFoundationApi::class
 )
 @Composable
 fun ItemEditScreen(navigation: NavController) {
@@ -100,7 +110,7 @@ fun ItemEditScreen(navigation: NavController) {
 
 
         //main photo
-        Box(modifier = Modifier.fillMaxWidth()){
+        /*Box(modifier = Modifier.fillMaxWidth()){
             Card(modifier = Modifier.padding(defaultBigCardPadding)) {
                 AsyncImage(
                     model = photoMain.value,
@@ -112,8 +122,130 @@ fun ItemEditScreen(navigation: NavController) {
                         .fillMaxWidth(),
                 )
             }
+        }*/
+
+        //photo carousel
+        Box(
+            contentAlignment = Alignment.Center,
+            modifier = Modifier
+                .clip(
+                    shape = RoundedCornerShape(
+                        topStart = 20.dp,
+                        topEnd = 20.dp
+                    )
+                )
+                .height(300.dp)
+                .padding(top = 15.dp)
+                .fillMaxWidth()
+                .background(MaterialTheme.colorScheme.surface)
+        ){
+            val bitmapList : MutableList<String> = mutableListOf(
+                photoBarCode, photoProduct.value
+            )
+            val pagerState = rememberPagerState(
+                pageCount = { bitmapList.size }
+            )
+            HorizontalPager(
+                state = pagerState,
+                key = null,
+            ){
+                    index ->
+                Box(
+                    contentAlignment = Alignment.BottomCenter,
+                    modifier = Modifier
+                        .fillMaxSize()
+                ){
+                    //ha nincs adat, jelenítsen meg egy default image-t
+                    if (bitmapList[index] === ""){
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(start = 10.dp, end = 10.dp)
+                                .clip(
+                                    shape = RoundedCornerShape(
+                                        topStart = 20.dp,
+                                        topEnd = 20.dp
+                                    )
+                                )
+                                .background(MaterialTheme.colorScheme.surfaceContainerLowest)
+                            ,
+                        ){
+                            Image(
+                                painterResource(R.mipmap.ic_launcher_foreground),
+//                            painterResource(R.drawable.chocolate_bar1),
+                                contentDescription = "appIcon",
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .padding(start = 10.dp, end = 10.dp)
+                                    .clip(
+                                        shape = RoundedCornerShape(
+                                            topStart = 20.dp,
+                                            topEnd = 20.dp
+                                        )
+                                    )
+                                ,
+                            )
+                            Box(
+                                contentAlignment = Alignment.TopCenter,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(bottom = 10.dp, end = 20.dp)
+                                    .alpha(20f)
+                            ){
+                                Row (
+                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    modifier = Modifier.fillMaxWidth().padding(start = 10.dp, top = 8.dp)
+                                ){
+                                    Text(text = "Not photo from product")
+                                    IconButton(
+                                        onClick = { navigation.navigate("ProductCameraView") },
+                                        modifier = Modifier.size(40.dp)
+                                    ) {
+                                        Icon(
+                                            Icons.Rounded.AddAPhoto,
+                                            contentDescription = "Localized description",
+                                            tint = MaterialTheme.colorScheme.primary,
+                                            modifier = Modifier.size(25.dp)
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    else{
+                        AsyncImage(
+                            model = bitmapList[index],
+                            contentDescription = null,
+                            contentScale = ContentScale.Crop,
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(start = 10.dp, end = 10.dp)
+                                .clip(
+                                    shape = RoundedCornerShape(
+                                        topStart = 20.dp,
+                                        topEnd = 20.dp
+                                    )
+                                )
+                            ,
+                        )
+                    }
+                    Box(
+                        contentAlignment = Alignment.BottomEnd,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 10.dp, end = 20.dp)
+                            .alpha(20f)
+                    ){
+                        Text(text = "${pagerState.currentPage+1}/${bitmapList.count()}")
+                    }
+                }
+            }
         }
 
+
+        /*
+        //ezt a részt bent hagyom, hogy ha vmi nem okés könnyen hozzáférjünk
         //small photos
         Box (modifier = Modifier.fillMaxWidth()) {
             Card(modifier = Modifier
@@ -203,6 +335,7 @@ fun ItemEditScreen(navigation: NavController) {
                 }
             }
         }
+        */
 
         //shop selection
         val shop= remember {
@@ -220,43 +353,106 @@ fun ItemEditScreen(navigation: NavController) {
         }
 
         var visible= remember { mutableStateOf(false) }
-        Row{
-            Button( onClick = {
-                //val ocr=OCR()
-                //ocr.MakeOCR(photoBarCode,context,{text-> })
-                //HTTP().sendImage(photoBarCode)
-            }) {
-                Text(text = "Process barcode image")
-            }
 
-            //edit barcode details
-            //TODO
-            // ezt a részt egy kicsit renbeszedni kinézetileg
-            Button(onClick = { visible.value = true }) {
-                Text(text = "Edit barcode data")
-            }
-            Button(onClick = {
-                CoroutineScope(Dispatchers.IO).launch {
-                    client.updateProduct(detectedName.value,shop.value,detectedPrice.value,photoProduct.value, {
-                        //onSuccess
-                        isLoaded.value=true
-                        this.cancel("Fuck you")
-                    }, {
-                        //onFailure
-                        isFailed.value=true
-                        this.cancel("Fuck you")
-                    },{
-                        //onNetworkError
-                        isNetworkError.value=true
-                        this.cancel("Fuck you")
+
+        //Buttons
+        Box(
+            contentAlignment = Alignment.BottomCenter,
+            modifier = Modifier.fillMaxSize()
+        ){
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceEvenly,
+                modifier = Modifier.fillMaxWidth().padding(bottom = 40.dp)
+            ){
+                ElevatedButton(
+                    onClick = {
+                        //val ocr=OCR()
+                        //ocr.MakeOCR(photoBarCode,context,{text-> })
+                        //HTTP().sendImage(photoBarCode)
+                    },
+                    colors = ButtonColors(
+                        containerColor = MaterialTheme.colorScheme.primary,
+                        contentColor = MaterialTheme.colorScheme.primary,
+                        disabledContainerColor = MaterialTheme.colorScheme.inversePrimary,
+                        disabledContentColor = MaterialTheme.colorScheme.inversePrimary
+                    ),
+                    modifier = Modifier
+                        .clip(shape = RoundedCornerShape(20.dp))
+                        .size(70.dp)
+                    ,
+                    content = {
+//                        Text(text = "Process Barcode")
+                        androidx.compose.material.Icon(
+                            Icons.Rounded.DocumentScanner,
+                            contentDescription = "AddTask Icon",
+                            tint = MaterialTheme.colorScheme.onPrimary,
+                            modifier = Modifier.fillMaxSize()
+                        )
                     }
-                    )
-                }
-            }) {
-                Text(text = "UPLOAD")
+                )
+                ElevatedButton(
+                    onClick = { visible.value = true },
+                    colors = ButtonColors(
+                        containerColor = MaterialTheme.colorScheme.primary,
+                        contentColor = MaterialTheme.colorScheme.primary,
+                        disabledContainerColor = MaterialTheme.colorScheme.inversePrimary,
+                        disabledContentColor = MaterialTheme.colorScheme.inversePrimary
+                    ),
+                    modifier = Modifier
+                        .clip(shape = RoundedCornerShape(20.dp))
+                        .size(70.dp)
+                    ,
+                    content = {
+//                        Text(text = "Edit data")
+                        androidx.compose.material.Icon(
+                            Icons.Rounded.EditAttributes,
+                            contentDescription = "AddTask Icon",
+                            tint = MaterialTheme.colorScheme.onPrimary,
+                            modifier = Modifier.fillMaxSize()
+                        )
+                    }
+                )
+                ElevatedButton(
+                    onClick = {
+                        CoroutineScope(Dispatchers.IO).launch {
+                            client.updateProduct(detectedName.value,shop.value,detectedPrice.value,photoProduct.value, {
+                                //onSuccess
+                                isLoaded.value=true
+                                this.cancel("Fuck you")
+                            }, {
+                                //onFailure
+                                isFailed.value=true
+                                this.cancel("Fuck you")
+                            },{
+                                //onNetworkError
+                                isNetworkError.value=true
+                                this.cancel("Fuck you")
+                            }
+                            )
+                        }
+                    },
+                    colors = ButtonColors(
+                        containerColor = MaterialTheme.colorScheme.primary,
+                        contentColor = MaterialTheme.colorScheme.primary,
+                        disabledContainerColor = MaterialTheme.colorScheme.inversePrimary,
+                        disabledContentColor = MaterialTheme.colorScheme.inversePrimary
+                    ),
+                    modifier = Modifier
+                        .clip(shape = RoundedCornerShape(20.dp))
+                        .size(70.dp)
+                    ,
+                    content = {
+                        androidx.compose.material.Icon(
+                            Icons.Rounded.CloudUpload,
+                            contentDescription = "AddTask Icon",
+                            tint = MaterialTheme.colorScheme.onPrimary,
+                            modifier = Modifier.fillMaxSize()
+                        )
+                    }
+                )
             }
         }
-
 
 //        TODO: ne legyen muliline és enternél menyjen a kövire
         BottomSheet_google(detectedName,detectedPrice,visible)
