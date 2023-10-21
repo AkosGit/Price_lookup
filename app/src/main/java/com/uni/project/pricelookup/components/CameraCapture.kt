@@ -13,17 +13,22 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.rounded.AddTask
+import androidx.compose.material.icons.rounded.Autorenew
+import androidx.compose.material.icons.rounded.Lens
 import androidx.compose.material.icons.sharp.Lens
-import androidx.compose.material3.Button
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.unit.dp
@@ -157,30 +162,83 @@ fun CameraCapture(
             }
         )
         if(IsPhototaken.value=="yes"){
-//TODO
-// kicsit rendbeszedni
-            Column(
-                modifier = Modifier.fillMaxSize()
-                    .background(MaterialTheme.colorScheme.background)
-            ) {
-                AsyncImage(model = PhotoPath.value, contentDescription = "", modifier = Modifier
-                    .height(500.dp)
-                    .fillMaxWidth())
-                Button( onClick = {
-                    onImageCaptured(PhotoPath.value)
-                    lifecycleOwner.lifecycleScope.coroutineContext.cancel()
-                    cameraExecutor.shutdownNow()
-                }) {//replace with icon
-                    Text(text = "Use")
-                }
-                Button( onClick = {
-                    IsPhototaken.value="no"
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+            ){
+                AsyncImage(
+                    model = PhotoPath.value,
+                    contentDescription = "",
+                    modifier = Modifier.fillMaxSize(),
+                    contentScale = ContentScale.Crop
+                )
 
-                    //TODO: delete old file
-                }) {//replace with icon
-                    Text(text = "Retry")
+                //BUTTONS
+                Box(
+                    contentAlignment = Alignment.BottomCenter,
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(bottom = 40.dp)
+                ) {
+                    Row(
+                        horizontalArrangement = Arrangement.SpaceAround,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(70.dp)
+                    ){
+                        ElevatedButton(
+                            onClick = {
+                                IsPhototaken.value="no"
+                                //TODO: delete old file
+                            },
+                            colors = ButtonColors(
+                                containerColor = MaterialTheme.colorScheme.primary,
+                                contentColor = MaterialTheme.colorScheme.primary,
+                                disabledContainerColor = MaterialTheme.colorScheme.inversePrimary,
+                                disabledContentColor = MaterialTheme.colorScheme.inversePrimary
+                            ),
+                            modifier = Modifier
+                                .clip(shape = RoundedCornerShape(20.dp))
+                                .size(70.dp)
+                            ,
+                            content = {
+                                Icon(
+                                    Icons.Rounded.Autorenew,
+                                    contentDescription = "AddTask Icon",
+                                    tint = MaterialTheme.colorScheme.onPrimary,
+                                    modifier = Modifier.fillMaxSize()
+                                )
+                            }
+                        )
+                        ElevatedButton(
+                            onClick = {
+                                onImageCaptured(PhotoPath.value)
+                                lifecycleOwner.lifecycleScope.coroutineContext.cancel()
+                                cameraExecutor.shutdownNow()
+                            },
+                            colors = ButtonColors(
+                                containerColor = MaterialTheme.colorScheme.primary,
+                                contentColor = MaterialTheme.colorScheme.primary,
+                                disabledContainerColor = MaterialTheme.colorScheme.inversePrimary,
+                                disabledContentColor = MaterialTheme.colorScheme.inversePrimary
+                            ),
+                            modifier = Modifier
+                                .clip(shape = RoundedCornerShape(20.dp))
+                                .size(70.dp)
+                            ,
+                            content = {
+                                Icon(
+                                    Icons.Rounded.AddTask,
+                                    contentDescription = "AddTask Icon",
+                                    tint = MaterialTheme.colorScheme.onPrimary,
+                                    modifier = Modifier.fillMaxSize()
+                                )
+                            }
+                        )
+                    }
                 }
             }
+
         }
     }
 }
