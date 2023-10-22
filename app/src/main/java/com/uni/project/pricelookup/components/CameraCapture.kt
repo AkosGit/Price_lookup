@@ -9,6 +9,7 @@ import androidx.camera.core.ImageCaptureException
 import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
@@ -31,6 +32,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
@@ -38,6 +40,7 @@ import androidx.lifecycle.coroutineScope
 import androidx.lifecycle.lifecycleScope
 import coil.compose.AsyncImage
 import com.uni.project.pricelookup.PreferencesManager
+import com.uni.project.pricelookup.R
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
@@ -127,13 +130,30 @@ fun CameraCapture(
     //lifecycleOwner.lifecycle.coroutineScope.coroutineContext.cancel()
     // 3
     Box(contentAlignment = Alignment.BottomCenter, modifier = Modifier.fillMaxSize()) {
+
         AndroidView({ previewView }, modifier = Modifier.fillMaxSize())
         val IsPhototaken= remember {
             mutableStateOf("no")
         }
         val PhotoPath= remember {
         mutableStateOf(Uri.EMPTY)
-    }
+        }
+
+        Box(
+            contentAlignment = Alignment.Center,
+            modifier = Modifier
+                .fillMaxSize()
+        ){
+            Image(
+                painterResource(R.mipmap.scanner_bounder_fg),
+                modifier = Modifier
+                    .fillMaxSize()
+                ,
+                contentScale = ContentScale.Crop,
+                contentDescription = null,
+            )
+        }
+
         IconButton(
             modifier = Modifier.padding(bottom = 20.dp),
             onClick = {
@@ -153,7 +173,7 @@ fun CameraCapture(
                 Icon(
                     imageVector = Icons.Sharp.Lens,
                     contentDescription = "Take picture",
-                    tint = Color.White,
+                    tint = MaterialTheme.colorScheme.primaryContainer,
                     modifier = Modifier
                         .size(100.dp)
                         .padding(1.dp)

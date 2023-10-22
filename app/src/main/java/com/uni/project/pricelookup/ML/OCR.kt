@@ -71,6 +71,7 @@ class OCR()  {
             .enableMultipleObjects()
             .enableClassification()  // Optional
             .build()*/
+
         val localModel = LocalModel.Builder()
             .setAssetFilePath("resnet_v2_101_1_metadata_1.tflite")
             // or .setAbsoluteFilePath(absolute file path to model file)
