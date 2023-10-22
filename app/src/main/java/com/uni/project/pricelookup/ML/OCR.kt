@@ -25,16 +25,23 @@ class OCR()  {
     fun <T> remove(list: MutableList<T>, predicate: Predicate<T>) {
         list.removeIf { x: T -> predicate.test(x) }
     }
+    fun cutInputImg(img:Bitmap):Bitmap{
+        var cutBitmap=img
+        val width=cutBitmap.width
+
+        return cutBitmap
+    }
     fun TEST(context: Context){
         //val testIMG=com.uni.project.pricelookup.R.drawable.lidl_close_pricetag_other_text spar_big_pricetag
         val testIMG=com.uni.project.pricelookup.R.drawable.spar_some_text
         var path: Uri = Uri.parse("android.resource://com.uni.project.pricelookup/" + testIMG)
         val recognizer = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS)
         val img = InputImage.fromFilePath(context,path)
-        val bitmap = BitmapFactory.decodeResource(
+        var bitmap = BitmapFactory.decodeResource(
             context.resources,
             testIMG
         )
+        bitmap=cutInputImg(bitmap)
         val result = recognizer.process(img)
             .addOnSuccessListener { visionText ->
                 ProcessResult(context,visionText.textBlocks,{},bitmap)

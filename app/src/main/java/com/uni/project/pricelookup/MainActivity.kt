@@ -104,6 +104,7 @@ class MainActivity : ComponentActivity() {
         return if (mediaDir != null && mediaDir.exists()) mediaDir else filesDir
     }
 
+
     @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
     @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -117,6 +118,7 @@ class MainActivity : ComponentActivity() {
         requestCameraPermission()
         setContent {
             PriceLookupTheme {
+                
                 //OCR().TEST(LocalContext.current)
                 ///HTTP().getAllImagesByItemId(1)
                 //saving output dir for saving files
