@@ -90,8 +90,6 @@ fun ItemEditScreen(navigation: NavController) {
     }
 
     Column(
-//TODO
-// basically megcsinálni egy carouselt, ahol a két kép között lehet scrollolni
         Modifier.onFocusChanged {
             val photoLocProduct = preferencesManager.getData("product", "")
             if (photoLocProduct != "") {
@@ -107,23 +105,6 @@ fun ItemEditScreen(navigation: NavController) {
         val smallPhotoTextModifier= Modifier
             .width(150.dp)
             .height(80.dp)
-
-
-
-        //main photo
-        /*Box(modifier = Modifier.fillMaxWidth()){
-            Card(modifier = Modifier.padding(defaultBigCardPadding)) {
-                AsyncImage(
-                    model = photoMain.value,
-                    contentDescription = null,
-
-                    modifier = Modifier
-                        .padding(20.dp)
-                        .height(100.dp)
-                        .fillMaxWidth(),
-                )
-            }
-        }*/
 
         //photo carousel
         Box(
@@ -244,100 +225,6 @@ fun ItemEditScreen(navigation: NavController) {
             }
         }
 
-
-        /*
-        //ezt a részt bent hagyom, hogy ha vmi nem okés könnyen hozzáférjünk
-        //small photos
-        Box (modifier = Modifier.fillMaxWidth()) {
-            Card(modifier = Modifier
-                .padding(defaultBigCardPadding)
-                .fillMaxWidth()
-            ) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceAround,
-                    verticalAlignment = Alignment.CenterVertically
-                ){
-                    ElevatedCard(
-                        modifier = Modifier.padding(defaultBigCardPadding)
-                    ){
-                        Column (
-//                            verticalArrangement = Arrangement.Center,
-                            horizontalAlignment = Alignment.CenterHorizontally
-                        ){
-                            Box(
-                                modifier = Modifier
-                                    .width(150.dp)
-                                    .height(100.dp)
-                                    .clickable {
-                                        photoMain.value = photoBarCode
-                                    }
-                            ){
-                                AsyncImage(
-                                    model = photoBarCode,
-                                    contentDescription = null,
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .clip(shape = RoundedCornerShape(10.dp))
-                                )
-                            }
-
-                            Text(text = "Photo of pricetag")
-                        }
-                    }
-
-                    ElevatedCard(
-                        modifier = Modifier.padding(defaultBigCardPadding)
-                    ) {
-                        Column(
-//                            verticalArrangement = Arrangement.Center,
-                            horizontalAlignment = Alignment.CenterHorizontally
-                        ) {
-                            Box(
-                                modifier = Modifier
-                                    .width(150.dp)
-                                    .height(100.dp)
-                                    .clickable {
-                                        photoMain.value = photoBarCode
-                                    }
-                            ){
-                                if (photoProduct.value == "") {
-                                    Box(
-                                        modifier = Modifier
-                                            .fillMaxSize()
-                                            .clickable {
-                                                navigation.navigate("ProductCameraView")
-                                            }
-                                    ){
-                                        Image(
-                                            painterResource(R.mipmap.ic_launcher_foreground),
-                                            contentDescription = "appIcon",
-                                            modifier = Modifier
-                                                .fillMaxSize()
-                                        )
-                                    }
-                                }
-                                else {
-                                    AsyncImage(
-                                        model = photoProduct.value,
-                                        contentDescription = null,
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .clip(shape = RoundedCornerShape(10.dp))
-                                            .clickable {
-                                                photoMain.value = photoProduct.value
-                                            }
-                                    )
-                                }
-                            }
-                            Text(text = "Photo of product")
-                        }
-                    }
-                }
-            }
-        }
-        */
-
         //shop selection
         val shop= remember {
             mutableStateOf("spar")
@@ -455,7 +342,6 @@ fun ItemEditScreen(navigation: NavController) {
             }
         }
 
-//        TODO: ne legyen muliline és enternél menyjen a kövire
         BottomSheet_google(detectedName,detectedPrice,visible)
         if(isNetworkError.value){
             NetworkError()

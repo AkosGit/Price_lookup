@@ -48,7 +48,6 @@ import com.uni.project.pricelookup.ML.OCR
 import com.uni.project.pricelookup.Views.*
 import com.uni.project.pricelookup.components.DrawerCard
 import com.uni.project.pricelookup.components.SearchWidget
-import com.uni.project.pricelookup.components.selecRandomImg
 import kotlinx.coroutines.launch
 import java.io.File
 import kotlin.math.roundToInt
