@@ -28,6 +28,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -45,6 +46,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
+import scannerboundpath.ScannerBounds
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
@@ -145,12 +147,10 @@ fun CameraCapture(
                 .fillMaxSize()
         ){
             Image(
-                painterResource(R.mipmap.scanner_bounder_fg),
-                modifier = Modifier
-                    .fillMaxSize()
-                ,
+                imageVector = ScannerBounds,
                 contentScale = ContentScale.Crop,
                 contentDescription = null,
+                modifier = Modifier.scale(1.3f)
             )
         }
 

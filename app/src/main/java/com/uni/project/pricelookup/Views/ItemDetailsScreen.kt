@@ -79,7 +79,7 @@ fun ItemDetailsScreen(navigation: NavController,itemId:String?) {
     val product = remember {
         mutableStateOf<Product?>(null)
     }
-    val client= HTTP()
+    val client= HTTP(context = context)
     CoroutineScope(Dispatchers.IO).launch {
         client.getProduct(ItemId = itemId!!,{
                 //onSuccess
