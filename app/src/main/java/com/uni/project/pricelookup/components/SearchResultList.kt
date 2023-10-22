@@ -1,6 +1,7 @@
 package com.uni.project.pricelookup.components
 
 import android.graphics.BitmapFactory
+import android.util.Log
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
@@ -31,17 +32,25 @@ fun SearchResultList(navigation: NavController, searchResultList: MutableState<S
 //        if(csabi.state.hallod){throw error('no.. I am asleep')}
         content = {
             items(searchResultList.value!!.searchResult) {item ->
-                val decodedString = Base64.decode(item.Pictures[0].image, 0)
-                val bitmap= BitmapFactory.decodeByteArray(decodedString, 0, decodedString.size)
-
-                SearchResultCard(
-                    productName = item.ProductName,
-                    imageModel = bitmap,
-                    productMinPrice = item.Prices.minOf { price -> price.Price  },
-                    navigation = navigation,
-                    ItemId = item.id
-                )
-
+                if (item.Pictures.size != 0){
+                    val decodedString = Base64.decode(item.Pictures[0].image, 0)
+                    val bitmap = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.size)
+                    SearchResultCard(
+                        productName = item.ProductName,
+                        imageModel = bitmap,
+                        productMinPrice = item.Prices.minOf { price -> price.Price  },
+                        navigation = navigation,
+                        ItemId = item.id
+                    )
+                }else{
+                    SearchResultCard(
+                        productName = item.ProductName,
+                        imageModel = "",
+                        productMinPrice = item.Prices.minOf { price -> price.Price  },
+                        navigation = navigation,
+                        ItemId = item.id
+                    )
+                }
             }
 
         }

@@ -1,5 +1,6 @@
 package com.uni.project.pricelookup.components
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -9,6 +10,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
@@ -25,7 +28,7 @@ fun SearchResultCard(
 ){
     ElevatedCard(
         elevation = CardDefaults.cardElevation(
-            defaultElevation = 4.dp
+            defaultElevation = 2.dp
         ),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surfaceVariant,
@@ -41,21 +44,47 @@ fun SearchResultCard(
 
         content = {
             Row{
-                AsyncImage(
-                    model = imageModel,
-                    contentDescription = null,
-                    alignment = Alignment.CenterStart,
-                    modifier = Modifier
-                        .width(200.dp)
-                        .height(130.dp)
-                        .clip(shape = RoundedCornerShape(
-                            topStart = 0.dp,
-                            topEnd = 30.dp,
-                            bottomEnd = 30.dp,
-                            bottomStart = 30.dp
-                        ))
-                    ,
-                )
+                if (imageModel == ""){
+                    Box(
+                        contentAlignment = Alignment.Center,
+                        modifier = Modifier
+                            .width(200.dp)
+                            .height(130.dp)
+                            .clip(
+                                shape = RoundedCornerShape(
+                                    topStart = 0.dp,
+                                    topEnd = 30.dp,
+                                    bottomEnd = 30.dp,
+                                    bottomStart = 30.dp
+                                )
+                            )
+                        ,
+                    ){
+                        Image(
+                            painterResource(R.mipmap.ic_launcher_foreground),
+                            contentDescription = null,
+                            contentScale = ContentScale.Crop
+                        )
+                    }
+                }
+                else {
+                    AsyncImage(
+                        model = imageModel,
+                        contentDescription = null,
+                        alignment = Alignment.CenterStart,
+                        modifier = Modifier
+                            .width(200.dp)
+                            .height(130.dp)
+                            .clip(
+                                shape = RoundedCornerShape(
+                                    topStart = 0.dp,
+                                    topEnd = 30.dp,
+                                    bottomEnd = 30.dp,
+                                    bottomStart = 30.dp
+                                )
+                            ),
+                    )
+                }
 
                 Column(
                     verticalArrangement = Arrangement.Center,
