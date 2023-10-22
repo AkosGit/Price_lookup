@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddLocation
 import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.rounded.CameraAlt
 import androidx.compose.material.icons.rounded.Menu
 import androidx.compose.material3.*
@@ -116,7 +117,7 @@ class MainActivity : ComponentActivity() {
         requestCameraPermission()
         setContent {
             PriceLookupTheme {
-//                OCR().TEST(LocalContext.current)
+                //OCR().TEST(LocalContext.current)
                 ///HTTP().getAllImagesByItemId(1)
                 //saving output dir for saving files
                 val context=LocalContext.current
@@ -133,8 +134,7 @@ class MainActivity : ComponentActivity() {
                     val appBarScrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
                     val items= listOf(
                         DrawerMenuItem(name = "Main page",path="MainPage", icon = Icons.Filled.Home),
-                        DrawerMenuItem(name = "Main page",path="MainPage", icon = Icons.Filled.Home),
-                        DrawerMenuItem(name = "Main page",path="MainPage", icon = Icons.Filled.Home)
+                        DrawerMenuItem(name = "Settings",path="SettingsView", icon = Icons.Filled.Settings),
                     )
                     val selectedItem = remember { mutableStateOf(items[0]) }
                     val drawerState = rememberDrawerState(DrawerValue.Closed)
@@ -259,6 +259,7 @@ class MainActivity : ComponentActivity() {
                                                 NavigationState.value?.destination ==navController.findDestination("SearchScreen/{query}")
                                                 || NavigationState.value?.destination==navController.findDestination("MainPage")
                                                 || NavigationState.value?.destination==navController.findDestination("ItemDetailsScreen/{query}")
+                                                || NavigationState.value?.destination==navController.findDestination("SettingsView")
                                             ){
                                                 SearchWidget(
                                                     text = searchText.value,
@@ -298,6 +299,9 @@ class MainActivity : ComponentActivity() {
                                                 }
                                                 composable("ProductCameraView") {backStackEntry ->
                                                     ProductCameraView(navigation = navController)
+                                                }
+                                                composable("SettingsView") {backStackEntry ->
+                                                    SettingsScreen(navigation = navController)
                                                 }
                                             }
                                         }

@@ -66,6 +66,7 @@ class OCR()  {
     fun detectObjects(bitmap: Bitmap,text: Text,context: Context){
         val blocks=text.textBlocks;
         val inObjectBlocks= emptyMap<DetectedObject,MutableList<TextBlock>>().toMutableMap()
+        //built in obejct detection
         /*val options = ObjectDetectorOptions.Builder()
             .setDetectorMode(ObjectDetectorOptions.SINGLE_IMAGE_MODE)
             .enableMultipleObjects()
@@ -73,7 +74,8 @@ class OCR()  {
             .build()*/
 
         val localModel = LocalModel.Builder()
-            .setAssetFilePath("resnet_v2_101_1_metadata_1.tflite")
+            //loaded from app/src/Main/assets folder
+            .setAssetFilePath("mnasnet_1.3_224_1_metadata_1.tflite")
             // or .setAbsoluteFilePath(absolute file path to model file)
             // or .setUri(URI to model file)
             .build()
@@ -115,6 +117,7 @@ class OCR()  {
     fun findBlockBasedOnDistance(filter:Regex,allBlocks:MutableList<TextBlock>,startPoint:TextBlock,returnSmaller:Boolean): Int {
         //returns the index of the result
 
+        //distance list from startPoint block
         val blockDistancesByTop= mutableListOf<Int>()
         val blockDistancesByBottom= mutableListOf<Int>()
         for (b in allBlocks){
@@ -283,12 +286,14 @@ class OCR()  {
     }
     private fun ProcessResult(
         context: Context,
+        //dictanoty deetcted obj as key and text blocks as values
         result: MutableMap<DetectedObject, MutableList<TextBlock>>,
         SuccesOCR: (Text:Text)-> Unit,
         bitmap: Bitmap){
         //TODO: if ft+price in the same block cant be found search for price block close to ft
         var currentBlock:TextBlock? = null
         val currencyregex = Regex("(\\d+)\\D*FT")
+        //price tag text blocks
         val blocks=result[findCorrectObj(result)]
         var AllBlocks= mutableListOf<TextBlock>()  //first it will contain all blocks which are not currency related than it will be filtered to search for product
         //search for block that has currency in it rest will go to AllBlocks
@@ -344,7 +349,7 @@ class OCR()  {
         )
         var currentBlockColors=getImageColors(currentBlockBitmap)
         //currentBlockColors=reduceColors(currentBlockColors)
-
+        //allblock get rif of very diffenr color blocks
         val differentColor = Predicate<TextBlock> { b:TextBlock ->
             val blockBitmap: Bitmap = Bitmap.createBitmap(
                 bitmap,

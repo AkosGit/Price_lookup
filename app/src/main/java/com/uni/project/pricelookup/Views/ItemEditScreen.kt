@@ -50,6 +50,7 @@ import kotlin.io.encoding.Base64
     DelicateCoroutinesApi::class, ExperimentalSheetApi::class, ExperimentalFoundationApi::class
 )
 @Composable
+//TODO: item upload indicator + jump to homepage
 fun ItemEditScreen(navigation: NavController) {
     val isLoaded = remember {
         mutableStateOf(false)
@@ -60,7 +61,7 @@ fun ItemEditScreen(navigation: NavController) {
     val isFailed = remember {
         mutableStateOf(false)
     }
-    val client=HTTP()
+    val client=HTTP(LocalContext.current)
     val defaultBigCardPadding = PaddingValues(start = 10.dp, top = 5.dp, end = 10.dp, bottom = 5.dp)
 
     //setup ocr data edit

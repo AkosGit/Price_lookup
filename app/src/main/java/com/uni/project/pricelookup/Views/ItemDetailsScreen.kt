@@ -5,7 +5,6 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.util.Log
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -45,6 +44,7 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
+import com.uni.project.pricelookup.MainActivity
 import com.uni.project.pricelookup.R
 import com.uni.project.pricelookup.components.CouponShapeLeftSide
 import com.uni.project.pricelookup.components.CouponShapeRightSide
@@ -103,6 +103,7 @@ fun ItemDetailsScreen(navigation: NavController,itemId:String?) {
             .fillMaxHeight()
     ) {
         if(isLoaded.value && product.value!=null){
+
             //ImageViewer
             Box(
                 contentAlignment = Alignment.Center,
@@ -125,7 +126,7 @@ fun ItemDetailsScreen(navigation: NavController,itemId:String?) {
                     bitmapList.add(bitmap)
                 }
                 val pagerState = rememberPagerState(
-                    pageCount = { if (bitmapList.size == 0) 1 else bitmapList.size }
+                    pageCount = { bitmapList.size }
                 )
                 HorizontalPager(
                     state = pagerState,
@@ -138,76 +139,29 @@ fun ItemDetailsScreen(navigation: NavController,itemId:String?) {
                             .fillMaxSize()
                             .background(Color.Transparent)
                     ){
-                        if (bitmapList.size != 0) {
-                            AsyncImage(
-                                model = bitmapList[index],
-                                contentDescription = null,
-                                contentScale = ContentScale.Crop,
-                                modifier = Modifier
-                                    .fillMaxSize()
-                                    .padding(start = 10.dp, end = 10.dp)
-                                    .clip(
-                                        shape = RoundedCornerShape(
-                                            topStart = 20.dp,
-                                            topEnd = 20.dp
-                                        )
-                                    ),
-                            )
-                        }
-                        else{
-                            Box(
-                                contentAlignment = Alignment.TopCenter,
-                                modifier = Modifier
-                                    .fillMaxSize()
-                                    .background(MaterialTheme.colorScheme.surfaceContainerLowest)
-                                    .padding(start = 10.dp, end = 10.dp)
-                                    .clip(
-                                        shape = RoundedCornerShape(
-                                            topStart = 20.dp,
-                                            topEnd = 20.dp
-                                        )
-                                    ),
-                            ){
-                                Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()){
-                                    Image(
-                                        painterResource(R.mipmap.ic_launcher_foreground),
-                                        modifier = Modifier
-                                            .width(120.dp)
-                                            .height(120.dp)
-                                        ,
-                                        contentDescription = null,
-                                        contentScale = ContentScale.Crop
+                        AsyncImage(
+                            model = bitmapList[index],
+                            contentDescription = null,
+                            contentScale = ContentScale.Crop,
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(start = 10.dp, end = 10.dp)
+                                .clip(
+                                    shape = RoundedCornerShape(
+                                        topStart = 20.dp,
+                                        topEnd = 20.dp
                                     )
-                                }
-                                Box(
-                                    contentAlignment = Alignment.TopCenter,
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(bottom = 10.dp, end = 20.dp)
-                                        .alpha(20f)
-                                ){
-                                    Row (
-                                        horizontalArrangement = Arrangement.SpaceBetween,
-                                        verticalAlignment = Alignment.CenterVertically,
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .padding(start = 10.dp, top = 8.dp)
-                                    ){
-                                        Text(text = "No photo from product")
-                                    }
-                                }
-                            }
-                        }
-                        if (bitmapList.size != 0){
-                            Box(
-                                contentAlignment = Alignment.BottomEnd,
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(bottom = 10.dp, end = 20.dp)
-                                    .alpha(20f)
-                            ){
-                                Text(text = "${pagerState.currentPage+1}/${bitmapList.count()}")
-                            }
+                                )
+                            ,
+                        )
+                        Box(
+                            contentAlignment = Alignment.BottomEnd,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(bottom = 10.dp, end = 20.dp)
+                                .alpha(20f)
+                        ){
+                            Text(text = "${pagerState.currentPage+1}/${bitmapList.count()}")
                         }
                     }
                 }
