@@ -19,7 +19,7 @@ class HTTP(
     //var baseURL:String = "http://192.168.0.184:3000"   //csabi
     val settings=preferencesManager.getData("SERVER_URL","").replace("http://","").replace(":3000","")
     val default = "prapi.szerver.cc"
-    var baseURL:String = "http://${if (settings=="") default else settings}:3000" //from settings
+    var baseURL:String = "${if (settings=="") default else settings}" //from settings
 
     private fun LOG(msg:String){
         Log.i("SEND_HTTP",msg)
