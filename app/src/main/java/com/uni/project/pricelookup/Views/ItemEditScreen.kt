@@ -227,7 +227,7 @@ fun ItemEditScreen(navigation: NavController) {
 
         //shop selection
         val shop= remember {
-            mutableStateOf("spar")
+            mutableStateOf("Spar")
         }
         Row(Modifier.padding(30.dp)) {
             ShopDropDown_google(shop)
