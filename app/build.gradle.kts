@@ -52,6 +52,7 @@ android {
 }
 
 dependencies {
+    implementation("com.github.SmartToolFactory:Compose-Cropper:0.4.0")
     implementation("com.google.mlkit:object-detection-custom:17.0.0")
     implementation("com.google.mlkit:object-detection:17.0.0")
     implementation("io.github.oleksandrbalan:modalsheet:0.6.0")

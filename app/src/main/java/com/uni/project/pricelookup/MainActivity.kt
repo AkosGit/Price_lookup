@@ -55,6 +55,7 @@ import kotlin.math.roundToInt
 //this is professional work :(
 class MainActivity : ComponentActivity() {
     companion object{
+
         fun CleanUpImages(context: Context){
             val preferencesManager = PreferencesManager(context)
             preferencesManager.saveData("photoLoc", "")
