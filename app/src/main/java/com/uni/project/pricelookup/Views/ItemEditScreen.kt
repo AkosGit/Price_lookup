@@ -50,6 +50,7 @@ import kotlin.io.encoding.Base64
     DelicateCoroutinesApi::class, ExperimentalSheetApi::class, ExperimentalFoundationApi::class
 )
 @Composable
+//TODO: item upload indicator + jump to homepage
 fun ItemEditScreen(navigation: NavController) {
     val isLoaded = remember {
         mutableStateOf(false)

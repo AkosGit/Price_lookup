@@ -16,8 +16,9 @@ class HTTP(
 ) {
     val preferencesManager = PreferencesManager(context)
     //var baseURL:String = "http://192.168.0.235:3000" //akos
-    var baseURL:String = "http://192.168.0.184:3000"   //csabi
-    //var baseURL:String = "http://${preferencesManager.getData("SERVER_URL","")}:3000" //from settings
+    //var baseURL:String = "http://192.168.0.184:3000"   //csabi
+    val settings=preferencesManager.getData("SERVER_URL","").replace("http://","").replace(":3000","")
+    var baseURL:String = "http://${settings}:3000" //from settings
 
     private fun LOG(msg:String){
         Log.i("SEND_HTTP",msg)
