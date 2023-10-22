@@ -26,7 +26,6 @@ class OCR()  {
         list.removeIf { x: T -> predicate.test(x) }
     }
     fun TEST(context: Context){
-        //konvertálunk az OCR saját formátumára
         //val testIMG=com.uni.project.pricelookup.R.drawable.lidl_close_pricetag_other_text spar_big_pricetag
         val testIMG=com.uni.project.pricelookup.R.drawable.spar_some_text
         var path: Uri = Uri.parse("android.resource://com.uni.project.pricelookup/" + testIMG)
@@ -36,11 +35,9 @@ class OCR()  {
             context.resources,
             testIMG
         )
-        //ez csinálja az OCRt
         val result = recognizer.process(img)
             .addOnSuccessListener { visionText ->
-                detectObjects(bitmap,visionText,context)
-                //ProcessResult(context,visionText,{},bitmap)
+                ProcessResult(context,visionText.textBlocks,{},bitmap)
             }
     }
     fun MakeOCR(ImagePath:String,context:Context,SuccesOCR: (Text:Text)-> Unit){
@@ -57,63 +54,14 @@ class OCR()  {
             val img = InputImage.fromBitmap(bitmap, 0)
             val result = recognizer.process(img)
                 .addOnSuccessListener { visionText ->
-                    detectObjects(bitmap,visionText,context)
-                    //ProcessResult(context,visionText, SuccesOCR,bitmap)
+                    ProcessResult(context,visionText.textBlocks, SuccesOCR,bitmap)
                 }
                 .addOnFailureListener { e ->
                     Toast.makeText(context, e.message, Toast.LENGTH_LONG).show()
                 }
         }
     }
-    fun detectObjects(bitmap: Bitmap,text: Text,context: Context){
-        val blocks=text.textBlocks;
-        val inObjectBlocks= emptyMap<DetectedObject,MutableList<TextBlock>>().toMutableMap()
-        //built in obejct detection
-        /*val options = ObjectDetectorOptions.Builder()
-            .setDetectorMode(ObjectDetectorOptions.SINGLE_IMAGE_MODE)
-            .enableMultipleObjects()
-            .enableClassification()  // Optional
-            .build()*/
-        val localModel = LocalModel.Builder()
-            //loaded from app/src/Main/assets folder
-            .setAssetFilePath("mnasnet_1.3_224_1_metadata_1.tflite")
-            // or .setAbsoluteFilePath(absolute file path to model file)
-            // or .setUri(URI to model file)
-            .build()
-        //val objectDetector = ObjectDetection.getClient(options)
-        val image = InputImage.fromBitmap(bitmap, 0)
-        val customObjectDetectorOptions =
-            CustomObjectDetectorOptions.Builder(localModel)
-                .setDetectorMode(CustomObjectDetectorOptions.SINGLE_IMAGE_MODE)
-                .enableMultipleObjects()
-                .enableClassification()
-                .setClassificationConfidenceThreshold(0.4f)
-                .setMaxPerObjectLabelCount(4)
-                .build()
-        val objectDetector =
-            ObjectDetection.getClient(customObjectDetectorOptions)
-        val TEXTBOX_ERROR_TOLLERANCE=3
-        objectDetector.process(image)
-            .addOnSuccessListener { detectedObjects ->
-                for (obj in detectedObjects){
-                    for(block in blocks){
-                        if(obj.boundingBox.contains(block.boundingBox!!.left-TEXTBOX_ERROR_TOLLERANCE, block.boundingBox!!.top-TEXTBOX_ERROR_TOLLERANCE,block.boundingBox!!.right-TEXTBOX_ERROR_TOLLERANCE,block.boundingBox!!.bottom-TEXTBOX_ERROR_TOLLERANCE)) {
-                            if(inObjectBlocks[obj]==null){
-                                inObjectBlocks[obj] = mutableListOf()
-                            }
-                            else{
-                                inObjectBlocks[obj]!!.add(block)
-                            }
-                        }
-                    }
-                }
-                ProcessResult(context,inObjectBlocks,{},bitmap)
-            }
-            .addOnFailureListener { e ->
-                // Task failed with an exception
-                // ...
-            }
-    }
+
 
     fun findBlockBasedOnDistance(filter:Regex,allBlocks:MutableList<TextBlock>,startPoint:TextBlock,returnSmaller:Boolean): Int {
         //returns the index of the result
@@ -156,105 +104,7 @@ class OCR()  {
         }
         return Index
     }
-    class RGBColor(
-        val red:Int,
-        val green:Int,
-        val blue:Int
-    )
-    fun getImageColors(bitmap: Bitmap): List<RGBColor> {
-        var colors:MutableList<RGBColor> = mutableListOf()
-        var previusColor: RGBColor? =null
-        var isSimilar=false
-        for (y in 0 until bitmap.height) {
-            for (x in 0 until bitmap.width) {
-                isSimilar=false
-                val color: Int = bitmap.getColor(x, y).toArgb()
-                val red: Int = Color.red(color)
-                val green: Int = Color.green(color)
-                val blue: Int = Color.blue(color)
-                //val alpha: Int = Color.alpha(color)
-                val colorOBJ=RGBColor(red=red,green=green,blue=blue)
-                if(previusColor!=null){
-                    val c=isColorSimilar(mutableListOf(colorOBJ),previusColor)
-                    if(c==null){
-                        colors.add(colorOBJ)
-                        isSimilar=true
-                    }
-                }
-                previusColor=colorOBJ
-            }
-        }
-        return colors
-    }
-    fun reduceColors(colors: List<RGBColor>): MutableList<RGBColor> {
-        val reducedColors:MutableList<RGBColor> = colors.toMutableList()
-        for (color in colors){
-            val isSimilarColorInIt = Predicate<RGBColor> { c: RGBColor ->
-                val similar=isColorSimilar(reducedColors,c)
-                if(similar==null) {
-                    return@Predicate false
-                }
-                return@Predicate true
-            }
-            remove(reducedColors,isSimilarColorInIt)
-        }
-        return reducedColors
-    }
-    fun isColorSimilar(original: List<RGBColor>,color: RGBColor,MATCH_ERROR:Int=3): RGBColor? {
-        for (origColor in original) {
-            //if two channels match
-            if (color.red== origColor.red && color.green == origColor.green && color.blue==origColor.blue) {
-                return color
-            }
-            if (color.blue == origColor.blue && color.red == origColor.red) {
-                if (abs(color.green - origColor.green) < MATCH_ERROR || abs(origColor.green - color.green) < MATCH_ERROR) {
-                    return color
-                }
-            }
-            if (color.blue == origColor.blue && color.green == origColor.green) {
-                if (abs(color.red - origColor.red) < MATCH_ERROR || abs(origColor.red - color.red) < MATCH_ERROR) {
-                    return color
-                }
-            }
-            if (color.red == origColor.red && color.green == origColor.green) {
-                if (abs(color.blue - origColor.blue) < MATCH_ERROR || abs(origColor.blue - color.blue) < MATCH_ERROR) {
-                    return color
-                }
-            }
-            if(color.red==origColor.red){
-                if (abs(color.blue - origColor.blue) < MATCH_ERROR || abs(origColor.blue - color.blue) < MATCH_ERROR) {
-                    if (abs(color.green - origColor.green) < MATCH_ERROR || abs(origColor.green - color.green) < MATCH_ERROR) {
-                        return color
-                    }
-                }
-            }
-            if(color.blue==origColor.blue){
-                if (abs(color.red - origColor.red) < MATCH_ERROR || abs(origColor.red - color.red) < MATCH_ERROR) {
-                    if (abs(color.green - origColor.green) < MATCH_ERROR || abs(origColor.green - color.green) < MATCH_ERROR) {
-                        return color
-                    }
-                }
-            }
-            if(color.green==origColor.green){
-                if (abs(color.blue - origColor.blue) < MATCH_ERROR || abs(origColor.blue - color.blue) < MATCH_ERROR) {
-                    if (abs(color.red - origColor.red) < MATCH_ERROR || abs(origColor.red - color.red) < MATCH_ERROR) {
-                        return color
-                    }
-                }
-            }
-        }
-        return null
-    }
-    fun compareColorList(original: List<RGBColor>, against: List<RGBColor>): Float {
-        val matchList:MutableList<Boolean> = mutableListOf()
-        for(color in against){
-            val match= isColorSimilar(original,color,12)
-            if(match!=null){
-                matchList.add(true)
-            }
-        }
-        return matchList.size.toFloat() / against.size.toFloat()
-    }
+
     fun removeBlocksWidthDifferentAngle(allBlocks:MutableList<TextBlock>,referenceBlock:TextBlock,ANGLE_DIFFERENCE:Int=5): MutableList<TextBlock> {
         val notInSameAngle = Predicate<TextBlock> { b: TextBlock -> b.lines[0].angle-ANGLE_DIFFERENCE >referenceBlock!!.lines[0].angle || b.lines[0].angle+ANGLE_DIFFERENCE< referenceBlock.lines[0].angle }
         remove(allBlocks,notInSameAngle)
@@ -275,27 +125,18 @@ class OCR()  {
         }
         return name
     }
-    fun findCorrectObj(result: MutableMap<DetectedObject, MutableList<TextBlock>>): DetectedObject? {
-        for (obj in result.keys){
-            for(b in result[obj]!!){
-                if(b.text.uppercase().contains("FT")){
-                    return obj
-                }
-            }
-        }
-        return null
-    }
+
+
     private fun ProcessResult(
         context: Context,
         //dictanoty deetcted obj as key and text blocks as values
-        result: MutableMap<DetectedObject, MutableList<TextBlock>>,
+        blocks: MutableList<TextBlock>?,
         SuccesOCR: (Text:Text)-> Unit,
         bitmap: Bitmap){
         //TODO: if ft+price in the same block cant be found search for price block close to ft
         var currentBlock:TextBlock? = null
         val currencyregex = Regex("(\\d+)\\D*FT")
         //price tag text blocks
-        val blocks=result[findCorrectObj(result)]
         var AllBlocks= mutableListOf<TextBlock>()  //first it will contain all blocks which are not currency related than it will be filtered to search for product
         //search for block that has currency in it rest will go to AllBlocks
         var currency:Int=0
