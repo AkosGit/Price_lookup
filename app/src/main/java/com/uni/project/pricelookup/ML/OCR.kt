@@ -28,6 +28,7 @@ class OCR()  {
         list.removeIf { x: T -> predicate.test(x) }
     }
     fun TEST(context: Context){
+        //konvertálunk az OCR saját formátumára
         //val testIMG=com.uni.project.pricelookup.R.drawable.lidl_close_pricetag_other_text spar_big_pricetag
         val testIMG=com.uni.project.pricelookup.R.drawable.spar_some_text
         var path: Uri = Uri.parse("android.resource://com.uni.project.pricelookup/" + testIMG)
@@ -37,10 +38,10 @@ class OCR()  {
             context.resources,
             testIMG
         )
+        //ez csinálja az OCRt
         val result = recognizer.process(img)
-            .addOnSuccessListener { visionText ->
-                detectObjects(bitmap,visionText,context)
-                //ProcessResult(context,visionText,{},bitmap)
+            .addOnSuccessListener { visionText -> //ebben vannak a blockok
+                ProcessResult(context,visionText.textBlocks,{},bitmap)
             }
     }
     fun MakeOCR(ImagePath:String,context:Context,SuccesOCR: (Text:Text)-> Unit){
