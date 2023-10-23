@@ -62,7 +62,9 @@ public class ImageSaver {
         }
         return "";
     }
-
+    public String GetImageOutputDir(String dirName){
+        return getAlbumStorageDir(dirName).getAbsolutePath();
+    }
     @NonNull
     private File createFile() {
         File directory;

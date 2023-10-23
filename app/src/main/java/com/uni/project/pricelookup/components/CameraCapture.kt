@@ -1,5 +1,6 @@
 package com.uni.project.pricelookup.components
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Bitmap
 import android.net.Uri
@@ -28,6 +29,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
@@ -38,18 +40,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
-import com.smarttoolfactory.cropper.ImageCropper
-import com.smarttoolfactory.cropper.model.OutlineType
-import com.smarttoolfactory.cropper.model.RectCropShape
-import com.smarttoolfactory.cropper.settings.CropDefaults
-import com.smarttoolfactory.cropper.settings.CropOutlineProperty
 import com.uni.project.pricelookup.ImageSaver
 import com.uni.project.pricelookup.ML.OCR
 import com.uni.project.pricelookup.PreferencesManager
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.cancel
-import kotlinx.coroutines.launch
+import io.moyuru.cropify.Cropify
+import io.moyuru.cropify.rememberCropifyState
+import kotlinx.coroutines.*
 import scannerboundpath.ScannerBounds
 import java.io.File
 import java.text.SimpleDateFormat
@@ -60,6 +56,7 @@ import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
 
+@SuppressLint("CoroutineCreationDuringComposition")
 @Composable
 fun CameraCapture(
     onImageCaptured: (Uri) -> Unit,
@@ -145,7 +142,7 @@ fun CameraCapture(
         val PhotoPath= remember {
         mutableStateOf(Uri.EMPTY)
         }
-
+        /*
         Box(
             contentAlignment = Alignment.Center,
             modifier = Modifier
@@ -157,7 +154,7 @@ fun CameraCapture(
                 contentDescription = null,
                 modifier = Modifier.scale(1.3f)
             )
-        }
+        }*/
 
         IconButton(
             modifier = Modifier.padding(bottom = 20.dp),
@@ -187,60 +184,9 @@ fun CameraCapture(
             }
         )
         if(IsPhototaken.value=="yes"){
-            //https://github.com/SmartToolFactory/Compose-Cropper/blob/master/app/src/main/java/com/smarttoolfactory/composecropper/demo/ImageCropDemo.kt
-            val cropStyle by remember { mutableStateOf(CropDefaults.style()) }
             val ocr=OCR()
             val bitmap=ocr.makeBitmapFromPath(PhotoPath.value)
-            val handleSize: Float = LocalDensity.current.run { 20.dp.toPx() }
-            var cropProperties =remember {
-                mutableStateOf(
-                    CropDefaults.properties(
-                        cropOutlineProperty = CropOutlineProperty(
-                            OutlineType.Rect,
-                            RectCropShape(0, "Rect")
-                        ),
-                        handleSize = handleSize
-                    )
-                )
-            }
-
-
-            var crop by remember { mutableStateOf(false) }
-            var showDialog by remember { mutableStateOf(false) }
-            var isCropping by remember { mutableStateOf(false) }
-
-            ImageCropper(
-                modifier = Modifier
-                    .fillMaxWidth(),
-                imageBitmap = bitmap.asImageBitmap() ,
-                contentDescription = "Image Cropper",
-                cropStyle = cropStyle,
-                cropProperties = cropProperties.value,
-                crop = crop,
-                onCropStart = {
-                    isCropping = true
-                },
-                onCropSuccess = {
-                    isCropping = false
-                    crop = false
-                    showDialog = true
-                    val res=it.asAndroidBitmap()
-
-                    /*val croppedBitmap: Bitmap = Bitmap.createBitmap(
-                        res, rectf.left * ratio,
-                        rectf.top * ratio, rectf.width() * ratio, rectf.height() * ratio, null, false
-                    )*/
-                    val f=ImageSaver(context).
-                    setFileName("myImage.png").
-                    setDirectoryName("images").
-                    save(res);
-                    val img=
-                    onImageCaptured(Uri.parse(f))
-                },
-            )
-            if (isCropping) {
-                CircularProgressIndicator()
-            }
+            val state = rememberCropifyState()
 
             Box(
                 modifier = Modifier
@@ -250,17 +196,31 @@ fun CameraCapture(
                 /*AsyncImage(
                     model = cuttedBitmap,
                     contentDescription = "",
-                    modifier = Modifier.fillMaxSize(),
                     contentScale = ContentScale.Crop
                 )*/
 
-                //BUTTONS
+                //#region BUTTONS
                 Box(
                     contentAlignment = Alignment.BottomCenter,
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(bottom = 40.dp)
                 ) {
+                    Cropify(
+                        modifier = Modifier
+                            .fillMaxSize()
+                        ,
+                        bitmap = bitmap.asImageBitmap(),
+                        state = state,
+                        onImageCropped = {
+                            val f=ImageSaver(context).
+                            setFileName("myImage.png").
+                            setDirectoryName("images").
+                            save(it.asAndroidBitmap());
+                            val img=
+                                onImageCaptured(Uri.parse(f))
+                        },
+                    )
                     Row(
                         horizontalArrangement = Arrangement.SpaceAround,
                         modifier = Modifier
@@ -293,7 +253,7 @@ fun CameraCapture(
                         )
                         ElevatedButton(
                             onClick = {
-                                crop=true
+                                state.crop()
                                 lifecycleOwner.lifecycleScope.coroutineContext.cancel()
                                 cameraExecutor.shutdownNow()
                             },
@@ -318,6 +278,7 @@ fun CameraCapture(
                         )
                     }
                 }
+                //#endregion
             }
 
         }
