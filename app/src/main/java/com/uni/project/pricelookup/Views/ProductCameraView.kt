@@ -5,6 +5,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavController
+import com.uni.project.pricelookup.ImageSaver
 import com.uni.project.pricelookup.PreferencesManager
 import com.uni.project.pricelookup.components.CameraCapture
 @Composable

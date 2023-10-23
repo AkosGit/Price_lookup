@@ -1,16 +1,15 @@
 package com.uni.project.pricelookup.components
 
 import android.content.Context
-import android.net.Uri
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.graphics.Matrix
 import android.util.Log
-import androidx.camera.core.CameraSelector
-import androidx.camera.core.ImageCapture
-import androidx.camera.core.ImageCaptureException
-import androidx.camera.core.Preview
+import androidx.camera.core.*
+import androidx.camera.core.ImageCapture.OnImageCapturedCallback
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
@@ -18,10 +17,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.rounded.AddTask
 import androidx.compose.material.icons.rounded.Autorenew
-import androidx.compose.material.icons.rounded.Lens
 import androidx.compose.material.icons.sharp.Lens
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -33,21 +30,22 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
-import androidx.lifecycle.coroutineScope
 import androidx.lifecycle.lifecycleScope
 import coil.compose.AsyncImage
 import com.uni.project.pricelookup.PreferencesManager
-import com.uni.project.pricelookup.R
+import io.moyuru.cropify.Cropify
+import io.moyuru.cropify.CropifyOption
+import io.moyuru.cropify.rememberCropifyState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 import scannerboundpath.ScannerBounds
 import java.io.File
+import java.nio.ByteBuffer
 import java.text.SimpleDateFormat
 import java.util.*
 import java.util.concurrent.Executor
@@ -88,7 +86,7 @@ fun CameraCapture(
         onImageCaptured: (Uri) -> Unit,
         onError: (ImageCaptureException) -> Unit,
         IsPhotoTaken: MutableState<String>,
-        PhotoPath: MutableState<Uri>
+        PhotoPath: MutableState<Bitmap?>,
     ) {
 
         val photoFile = File(
@@ -98,23 +96,44 @@ fun CameraCapture(
 
         val outputOptions = ImageCapture.OutputFileOptions.Builder(photoFile).build()
 
-        imageCapture.takePicture(outputOptions, executor, object: ImageCapture.OnImageSavedCallback {
-            override fun onError(exception: ImageCaptureException) {
-                Log.e("kilo", "Take photo error:", exception)
-                onError(exception)
-            }
+        imageCapture.takePicture(
+            ContextCompat.getMainExecutor(context),
+            object : OnImageCapturedCallback(){
+                @androidx.annotation.OptIn(androidx.camera.core.ExperimentalGetImage::class)
+                override fun onCaptureSuccess(image: ImageProxy) {
+                    super.onCaptureSuccess(image)
 
-            override fun onImageSaved(outputFileResults: ImageCapture.OutputFileResults) {
-                val savedUri = Uri.fromFile(photoFile)
-                CoroutineScope(Dispatchers.Main).launch {
-                    //onImageCaptured(savedUri)
-                    IsPhotoTaken.value="yes"
-                    PhotoPath.value=savedUri
+                    val matrix = Matrix().apply{
+                        postRotate(image.imageInfo.rotationDegrees.toFloat())
+                    }
+                    val buffer: ByteBuffer = image.image!!.getPlanes().get(0).getBuffer()
+                    val bytes = ByteArray(buffer.capacity())
+                    buffer[bytes]
+                    val bitmapImage = BitmapFactory.decodeByteArray(bytes, 0, bytes.size, null)
 
+                    val rotatedBitmap = Bitmap.createBitmap(
+                        bitmapImage,
+                        0,
+                        0,
+                        image.width,
+                        image.height,
+                        matrix,
+                        true
+                    )
+                    //onImageCaptured(rotatedBitmap)
+
+                    CoroutineScope(Dispatchers.Main).launch {
+                        IsPhotoTaken.value="yes"
+                        PhotoPath.value=rotatedBitmap
+                    }
                 }
-
+                override fun onError(exception: ImageCaptureException) {
+                    Log.e("kilo", "Take photo error:", exception)
+                    onError(exception)
+                }
             }
-        })
+        )
+
     }
     LaunchedEffect(lensFacing) {
         val cameraProvider = context.getCameraProvider()
@@ -141,17 +160,19 @@ fun CameraCapture(
         mutableStateOf(Uri.EMPTY)
         }
 
-        Box(
-            contentAlignment = Alignment.Center,
-            modifier = Modifier
-                .fillMaxSize()
-        ){
-            Image(
-                imageVector = ScannerBounds,
-                contentScale = ContentScale.Crop,
-                contentDescription = null,
-                modifier = Modifier.scale(1.3f)
-            )
+        if (IsPhototaken.value=="no"){
+            Box(
+                contentAlignment = Alignment.Center,
+                modifier = Modifier
+                    .fillMaxSize()
+            ){
+                Image(
+                    imageVector = ScannerBounds,
+                    contentScale = ContentScale.Crop,
+                    contentDescription = null,
+                    modifier = Modifier.scale(1.3f)
+                )
+            }
         }
 
         IconButton(
@@ -166,7 +187,7 @@ fun CameraCapture(
                     onImageCaptured = onImageCaptured,
                     onError = onError,
                     IsPhotoTaken=IsPhototaken,
-                    PhotoPath=PhotoPath
+                    PhotoPath=PhotoPath,
                 )
             },
             content = {
@@ -191,6 +212,20 @@ fun CameraCapture(
                     contentDescription = "",
                     modifier = Modifier.fillMaxSize(),
                     contentScale = ContentScale.Crop
+                )
+
+                Cropify(
+//                    option = CropifyOption(
+//
+//                    ),
+                    modifier = Modifier
+                        .fillMaxSize()
+                    ,
+                    bitmap = PhotoPath.value!!.asImageBitmap(),
+                    state = cropifyState,
+                    onImageCropped = {
+                        onImageCaptured(it.asAndroidBitmap())
+                    },
                 )
 
                 //BUTTONS
@@ -224,7 +259,7 @@ fun CameraCapture(
                             content = {
                                 Icon(
                                     Icons.Rounded.Autorenew,
-                                    contentDescription = "AddTask Icon",
+                                    contentDescription = "retry photo icon",
                                     tint = MaterialTheme.colorScheme.onPrimary,
                                     modifier = Modifier.fillMaxSize()
                                 )
@@ -249,7 +284,7 @@ fun CameraCapture(
                             content = {
                                 Icon(
                                     Icons.Rounded.AddTask,
-                                    contentDescription = "AddTask Icon",
+                                    contentDescription = "send image icon",
                                     tint = MaterialTheme.colorScheme.onPrimary,
                                     modifier = Modifier.fillMaxSize()
                                 )
@@ -258,7 +293,6 @@ fun CameraCapture(
                     }
                 }
             }
-
         }
     }
 }
