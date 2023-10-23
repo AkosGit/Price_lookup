@@ -177,7 +177,9 @@ fun ItemEditScreen(navigation: NavController) {
                                 Row (
                                     horizontalArrangement = Arrangement.SpaceBetween,
                                     verticalAlignment = Alignment.CenterVertically,
-                                    modifier = Modifier.fillMaxWidth().padding(start = 10.dp, top = 8.dp)
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(start = 10.dp, top = 8.dp)
                                 ){
                                     Text(text = "Not photo from product")
                                     IconButton(
@@ -233,12 +235,6 @@ fun ItemEditScreen(navigation: NavController) {
             ShopDropDown_google(shop)
         }
 
-        fun OnOCRSucces(visionText: Text){
-            Toast.makeText(context,visionText.text,Toast.LENGTH_LONG).show()
-        }
-        fun OnOCRFail(Error: Exception){
-            Toast.makeText(context,Error.message,Toast.LENGTH_LONG).show()
-        }
 
         var visible= remember { mutableStateOf(false) }
 
@@ -251,7 +247,9 @@ fun ItemEditScreen(navigation: NavController) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceEvenly,
-                modifier = Modifier.fillMaxWidth().padding(bottom = 40.dp)
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 40.dp)
             ){
                 ElevatedButton(
                     onClick = {
@@ -340,6 +338,16 @@ fun ItemEditScreen(navigation: NavController) {
                     }
                 )
             }
+        }
+        if(isNetworkError.value){
+            NetworkError()
+        }
+        if(isFailed.value){
+            Toast.makeText(context,"Server couldn't process item",Toast.LENGTH_LONG).show()
+        }
+        if(isLoaded.value){
+            Toast.makeText(context,"Item processed succesfully",Toast.LENGTH_LONG).show()
+            navigation.navigate("MainPage")
         }
 
         BottomSheet_google(detectedName,detectedPrice,visible)

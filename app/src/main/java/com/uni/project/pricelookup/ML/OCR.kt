@@ -3,15 +3,10 @@ package com.uni.project.pricelookup.ML
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import android.graphics.Color
+import android.graphics.Matrix
 import android.net.Uri
 import android.widget.Toast
-import com.google.mlkit.common.model.LocalModel
 import com.google.mlkit.vision.common.InputImage
-import com.google.mlkit.vision.objects.DetectedObject
-import com.google.mlkit.vision.objects.ObjectDetection
-import com.google.mlkit.vision.objects.custom.CustomObjectDetectorOptions
-import com.google.mlkit.vision.objects.defaults.ObjectDetectorOptions
 import com.google.mlkit.vision.text.Text
 import com.google.mlkit.vision.text.Text.TextBlock
 import com.google.mlkit.vision.text.TextRecognition
@@ -26,10 +21,67 @@ class OCR()  {
         list.removeIf { x: T -> predicate.test(x) }
     }
     fun cutInputImg(img:Bitmap):Bitmap{
-        var cutBitmap=img
-        val width=cutBitmap.width
+        val height=img.height
+        val width=img.width
+        val oneThird=height/3
+        val twoThird=(height/3)*2
+        val cutBitmap: Bitmap = Bitmap.createBitmap(
+            img, //img it self
+            0, //bottom
+            twoThird, //top
+            width-20, //width
+            oneThird //height
+        )
 
-        return cutBitmap
+        /*val middleThirdBitmap = Bitmap.createBitmap(img.width, oneThird,        Bitmap.Config.ARGB_8888 )
+
+// Create a Canvas to draw on the middle third Bitmap
+
+// Create a Canvas to draw on the middle third Bitmap
+        val canvas = android.graphics.Canvas(middleThirdBitmap)
+
+// Calculate the source and destination Rect for the middle third
+
+// Calculate the source and destination Rect for the middle third
+        val srcRect = Rect(0, twoThird-10, img.width, oneThird-10)
+        val dstRect = Rect(0, twoThird, img.width, 0)
+
+// Draw the middle third onto the new Bitmap
+
+// Draw the middle third onto the new Bitmap
+        canvas.drawBitmap(img, srcRect, dstRect, null)
+        return middleThirdBitmap*/
+        val newWidth = width
+        val newHeight = oneThird
+
+// calculate the scale - in this case = 0.4f
+
+// calculate the scale - in this case = 0.4f
+        val scaleWidth = newWidth.toFloat() / width
+        val scaleHeight = newHeight.toFloat() / height
+
+// createa matrix for the manipulation
+
+// createa matrix for the manipulation
+        val matrix = Matrix()
+// resize the bit map
+// resize the bit map
+        matrix.postScale(scaleWidth, scaleHeight)
+
+// recreate the new Bitmap
+
+// recreate the new Bitmap
+        val resizedBitmap = Bitmap.createBitmap(
+            img, 0, 0,
+            width, height, matrix, true
+        )
+        return  resizedBitmap
+    }
+    fun makeBitmapFromPath(ImagePath: Uri): Bitmap {
+        val image = ImagePath.path?.let { File(it) }
+        val bmOptions = BitmapFactory.Options()
+        var bitmap = BitmapFactory.decodeFile(image!!.absolutePath, bmOptions)
+        return bitmap
     }
     fun TEST(context: Context){
         //val testIMG=com.uni.project.pricelookup.R.drawable.lidl_close_pricetag_other_text spar_big_pricetag
@@ -49,14 +101,10 @@ class OCR()  {
     }
     fun MakeOCR(ImagePath:String,context:Context,SuccesOCR: (Text:Text)-> Unit){
         val recognizer = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS)
-        val image = File(ImagePath)
-        val bmOptions = BitmapFactory.Options()
-        var bitmap = BitmapFactory.decodeFile(image.absolutePath, bmOptions)
-
         val file= File(ImagePath).exists()
         if(file) {
-            Toast.makeText(context, "ITSSSSS ALIVEEEEE", Toast.LENGTH_LONG).show()
-
+            Toast.makeText(context, "ITSSSSS ALIVEEEEE!!! Run for your life! ITS GONNA ORK YOU!!!", Toast.LENGTH_LONG).show()
+            val bitmap=makeBitmapFromPath(Uri.parse(ImagePath))
 
             val img = InputImage.fromBitmap(bitmap, 0)
             val result = recognizer.process(img)

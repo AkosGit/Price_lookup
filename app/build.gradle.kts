@@ -52,6 +52,7 @@ android {
 }
 
 dependencies {
+    implementation("com.github.moyuruaizawa:cropify:0.3.1")
     implementation("com.google.mlkit:object-detection-custom:17.0.0")
     implementation("com.google.mlkit:object-detection:17.0.0")
     implementation("io.github.oleksandrbalan:modalsheet:0.6.0")
