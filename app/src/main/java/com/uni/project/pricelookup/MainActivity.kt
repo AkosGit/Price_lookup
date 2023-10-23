@@ -59,8 +59,8 @@ class MainActivity : ComponentActivity() {
             val preferencesManager = PreferencesManager(context)
             preferencesManager.saveData("photoLoc", "")
             preferencesManager.saveData("product","")
-            val jpgFiles = File(preferencesManager.getData("outputDir","")).listFiles { file -> file.name.endsWith(".jpg") }
-            jpgFiles?.forEach { file -> file.delete() }
+            val pngFiles = File(ImageSaver(context).GetImageOutputDir("images")).listFiles { file -> file.name.endsWith(".jpg") }
+            pngFiles?.forEach { file -> file.delete() }
 
         }
     }

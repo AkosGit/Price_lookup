@@ -17,7 +17,11 @@ fun ProductCameraView(navigation: NavController){
             Toast.makeText(context, "Error taking photo", Toast.LENGTH_SHORT).show()
         },
         onImageCaptured = {
-            val imagePath=it.path.toString()
+            val saver = ImageSaver(context)
+            val imagePath=saver.
+            setFileName("product.png").
+            setDirectoryName("images").
+            save(it);
             preferencesManager.saveData("product",imagePath)
             navigation.popBackStack()
         }

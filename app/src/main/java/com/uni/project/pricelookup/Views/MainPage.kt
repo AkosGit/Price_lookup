@@ -15,6 +15,7 @@ import androidx.compose.ui.text.font.FontWeight.Companion.Bold
 import androidx.compose.ui.unit.dp
 import androidx.navigation.*
 import com.uni.project.pricelookup.HTTP
+import com.uni.project.pricelookup.MainActivity
 import com.uni.project.pricelookup.components.NetworkError
 import com.uni.project.pricelookup.components.PhotoGrid
 import com.uni.project.pricelookup.models.SearchResult
@@ -27,6 +28,8 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun MainPage(navigation: NavController) {
+    val context= LocalContext.current
+    MainActivity.CleanUpImages(context)
     val isLoaded = remember {
         mutableStateOf(false)
     }
@@ -39,7 +42,7 @@ fun MainPage(navigation: NavController) {
     val results = remember {
         mutableStateOf<SearchResult?>(null)
     }
-    val client= HTTP(LocalContext.current)
+    val client= HTTP(context)
     CoroutineScope(Dispatchers.IO).launch {
         client.getRecommendations({
                 //onSuccess

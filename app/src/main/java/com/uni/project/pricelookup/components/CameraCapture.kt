@@ -27,6 +27,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.asAndroidBitmap
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
@@ -55,7 +57,7 @@ import kotlin.coroutines.suspendCoroutine
 
 @Composable
 fun CameraCapture(
-    onImageCaptured: (Uri) -> Unit,
+    onImageCaptured: (Bitmap) -> Unit,
     onError: (ImageCaptureException) -> Unit
 ) {
 
@@ -83,7 +85,7 @@ fun CameraCapture(
         imageCapture: ImageCapture,
         outputDirectory: File,
         executor: Executor,
-        onImageCaptured: (Uri) -> Unit,
+        onImageCaptured: (Bitmap) -> Unit,
         onError: (ImageCaptureException) -> Unit,
         IsPhotoTaken: MutableState<String>,
         PhotoPath: MutableState<Bitmap?>,
@@ -156,8 +158,8 @@ fun CameraCapture(
         val IsPhototaken= remember {
             mutableStateOf("no")
         }
-        val PhotoPath= remember {
-        mutableStateOf(Uri.EMPTY)
+        val PhotoPath :MutableState<Bitmap?> = remember {
+            mutableStateOf(null)
         }
 
         if (IsPhototaken.value=="no"){
@@ -203,6 +205,7 @@ fun CameraCapture(
             }
         )
         if(IsPhototaken.value=="yes"){
+            val cropifyState = rememberCropifyState()
             Box(
                 modifier = Modifier
                     .fillMaxSize()
@@ -267,7 +270,7 @@ fun CameraCapture(
                         )
                         ElevatedButton(
                             onClick = {
-                                onImageCaptured(PhotoPath.value)
+                                cropifyState.crop()
                                 lifecycleOwner.lifecycleScope.coroutineContext.cancel()
                                 cameraExecutor.shutdownNow()
                             },
