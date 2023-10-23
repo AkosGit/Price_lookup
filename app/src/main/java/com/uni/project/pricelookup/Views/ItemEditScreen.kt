@@ -381,7 +381,10 @@ fun ItemEditScreen(navigation: NavController) {
             navigation.navigate("MainPage")
         }
 
-        BottomSheet_google(detectedName,detectedPrice,visible)
+        if(ocrWasDone(detectedName.value)){
+            BottomSheet_google(detectedName,detectedPrice,visible)
+        }
+
         if(isNetworkError.value){
             NetworkError()
         }
