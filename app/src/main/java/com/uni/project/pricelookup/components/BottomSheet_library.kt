@@ -21,7 +21,7 @@ import eu.wewox.modalsheet.ModalSheet
 @Composable
 fun BottomSheet_google(detectedName: MutableState<String>, detectedPrice:MutableState<Int>,visible: MutableState<Boolean> ) {
     val priceString = remember {
-        mutableStateOf("0")
+        mutableStateOf(detectedPrice.value.toString())
     }
     ModalSheet(
         visible = visible.value,
