@@ -62,10 +62,6 @@ class MainActivity : ComponentActivity() {
             preferencesManager.saveData("product","")
             val pngFiles = File(ImageSaver(context).GetImageOutputDir("images")).listFiles { file -> file.name.endsWith(".jpg") }
             pngFiles?.forEach { file -> file.delete() }
-
-            val pngFiles = File(ImageSaver(context).GetImageOutputDir("images")).listFiles { file -> file.name.endsWith(".jpg") }
-            jpgFiles?.forEach { file -> file.delete() }
-
         }
     }
 
