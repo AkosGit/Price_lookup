@@ -107,7 +107,7 @@ class HTTP(
                         }
                     }
                     is Result.Failure -> {
-                        if(result.error.response.statusCode==406){
+                        if(result.error.response.statusCode == 406){
                             onFailure.invoke()
                         }
                         else{

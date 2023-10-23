@@ -28,8 +28,6 @@ import kotlin.io.encoding.ExperimentalEncodingApi
 @OptIn(ExperimentalEncodingApi::class)
 @Composable
 fun ProductPreviewCard(photo:Int = R.drawable.chocolate_bar1, navigation: NavController?,item:Product?) {
-    //TODO: display base picture
-
     ElevatedCard(
         modifier = Modifier
             .padding(all = 1.dp)

@@ -280,11 +280,12 @@ class MainActivity : ComponentActivity() {
                                                 )
                                             }
 
+                                            //OCR().TEST(LocalContext.current, R.drawable.dm)
+
                                             //basically that's the router :)
                                             NavHost(navController = navController, startDestination = "MainPage") {
                                                 composable("MainPage") {
                                                     MainPage(navigation = navController)
-
                                                 }
                                                 composable("SearchScreen/{query}") {backStackEntry ->
                                                     SearchScreen(navigation = navController,backStackEntry.arguments?.getString("query"))

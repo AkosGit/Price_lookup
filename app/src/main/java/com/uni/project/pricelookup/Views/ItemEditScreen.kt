@@ -5,7 +5,6 @@ import android.widget.Toast
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
@@ -35,16 +34,12 @@ import eu.wewox.modalsheet.ExperimentalSheetApi
 import kotlinx.coroutines.*
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
-import com.google.mlkit.vision.text.Text
 import com.uni.project.pricelookup.HTTP
 import com.uni.project.pricelookup.ML.OCR
 import com.uni.project.pricelookup.R
 import com.uni.project.pricelookup.components.NetworkError
-import com.uni.project.pricelookup.models.SearchResult
-import kotlin.io.encoding.Base64
 
 fun ocrWasDone(detectedName: String): Boolean{
     return if (detectedName != "") true
@@ -313,6 +308,7 @@ fun ItemEditScreen(navigation: NavController) {
                     }
                 )
                 ElevatedButton(
+                    enabled = ocrWasDone(detectedName.value),
                     onClick = { visible.value = true },
                     colors = ButtonColors(
                         containerColor = MaterialTheme.colorScheme.primary,
@@ -327,7 +323,7 @@ fun ItemEditScreen(navigation: NavController) {
                     content = {
                         androidx.compose.material.Icon(
                             Icons.Rounded.EditAttributes,
-                            contentDescription = "AddTask Icon",
+                            contentDescription = "Edit datas icon",
                             tint = MaterialTheme.colorScheme.onPrimary,
                             modifier = Modifier.fillMaxSize()
                         )
@@ -366,7 +362,7 @@ fun ItemEditScreen(navigation: NavController) {
                     content = {
                         androidx.compose.material.Icon(
                             Icons.Rounded.CloudUpload,
-                            contentDescription = "AddTask Icon",
+                            contentDescription = "Add task Icon",
                             tint = MaterialTheme.colorScheme.onPrimary,
                             modifier = Modifier.fillMaxSize(),
                         )
