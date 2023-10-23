@@ -1,11 +1,25 @@
 package com.uni.project.pricelookup.ML
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import android.graphics.Matrix
+import android.graphics.Paint
 import android.net.Uri
 import android.widget.Toast
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.runtime.*
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawWithCache
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.nativeCanvas
+import androidx.compose.ui.graphics.painter.BitmapPainter
 import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.text.Text
 import com.google.mlkit.vision.text.Text.TextBlock
@@ -14,78 +28,55 @@ import com.google.mlkit.vision.text.latin.TextRecognizerOptions
 import java.io.File
 import java.util.function.Predicate
 import kotlin.math.abs
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.unit.sp
+
+fun Modifier.boundingBox(
+    color: Color = Color.Magenta,
+    strokeWidth: Float = 3f,
+    size: Size,
+    topleft:Offset,
+    text: String
+) = drawWithCache {
+    val stroke = Stroke(strokeWidth)
+    val paint = Paint()
+    paint.setTextSize(35f)
+    paint.color = android.graphics.Color.GREEN
+    onDrawWithContent {
+        this.drawContext.canvas.nativeCanvas.drawText(
+            "${text}",
+            topleft.x, topleft.y, paint
+        )
+        drawContent()
+        drawRect(
+            topLeft = topleft,
+            color = Color.Magenta,
+            size = size,
+            style = stroke
+        )
+    }
+}
 
 
 class OCR()  {
     fun <T> remove(list: MutableList<T>, predicate: Predicate<T>) {
         list.removeIf { x: T -> predicate.test(x) }
     }
-    fun cutInputImg(img:Bitmap):Bitmap{
-        val height=img.height
-        val width=img.width
-        val oneThird=height/3
-        val twoThird=(height/3)*2
-        val cutBitmap: Bitmap = Bitmap.createBitmap(
-            img, //img it self
-            0, //bottom
-            twoThird, //top
-            width-20, //width
-            oneThird //height
-        )
 
-        /*val middleThirdBitmap = Bitmap.createBitmap(img.width, oneThird,        Bitmap.Config.ARGB_8888 )
-
-// Create a Canvas to draw on the middle third Bitmap
-
-// Create a Canvas to draw on the middle third Bitmap
-        val canvas = android.graphics.Canvas(middleThirdBitmap)
-
-// Calculate the source and destination Rect for the middle third
-
-// Calculate the source and destination Rect for the middle third
-        val srcRect = Rect(0, twoThird-10, img.width, oneThird-10)
-        val dstRect = Rect(0, twoThird, img.width, 0)
-
-// Draw the middle third onto the new Bitmap
-
-// Draw the middle third onto the new Bitmap
-        canvas.drawBitmap(img, srcRect, dstRect, null)
-        return middleThirdBitmap*/
-        val newWidth = width
-        val newHeight = oneThird
-
-// calculate the scale - in this case = 0.4f
-
-// calculate the scale - in this case = 0.4f
-        val scaleWidth = newWidth.toFloat() / width
-        val scaleHeight = newHeight.toFloat() / height
-
-// createa matrix for the manipulation
-
-// createa matrix for the manipulation
-        val matrix = Matrix()
-// resize the bit map
-// resize the bit map
-        matrix.postScale(scaleWidth, scaleHeight)
-
-// recreate the new Bitmap
-
-// recreate the new Bitmap
-        val resizedBitmap = Bitmap.createBitmap(
-            img, 0, 0,
-            width, height, matrix, true
-        )
-        return  resizedBitmap
-    }
     fun makeBitmapFromPath(ImagePath: Uri): Bitmap {
         val image = ImagePath.path?.let { File(it) }
         val bmOptions = BitmapFactory.Options()
         var bitmap = BitmapFactory.decodeFile(image!!.absolutePath, bmOptions)
         return bitmap
     }
-    fun TEST(context: Context){
-        //val testIMG=com.uni.project.pricelookup.R.drawable.lidl_close_pricetag_other_text spar_big_pricetag
-        val testIMG=com.uni.project.pricelookup.R.drawable.spar_some_text
+    @SuppressLint("MutableCollectionMutableState")
+    @Composable
+    fun TEST(context: Context,testIMG:Int){
+        val blocks:MutableState<Text?> = remember {
+            mutableStateOf(null)
+        }
+
         var path: Uri = Uri.parse("android.resource://com.uni.project.pricelookup/" + testIMG)
         val recognizer = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS)
         val img = InputImage.fromFilePath(context,path)
@@ -93,28 +84,73 @@ class OCR()  {
             context.resources,
             testIMG
         )
-        bitmap=cutInputImg(bitmap)
+        /*val res=bitmap.copy(Bitmap.Config.ARGB_8888,true).asImageBitmap()
+        val canvas= Canvas(res)
+        val rect= Rect(0.toFloat(), bitmap.height.toFloat(), bitmap.width.toFloat(), 0.toFloat())
+        canvas.drawImage(bitmap, rect, rect, null)*/
+//        Box(
+//            modifier = Modifier
+//                .fillMaxSize()
+//                .background(MaterialTheme.colorScheme.surface)
+//        ){
+//            if(blocks.value != null){
+//                val mod=Modifier
+//
+//                Box(
+//                    modifier = Modifier
+//                        .fillMaxSize()
+//                ){
+//                    Image(
+//                        painter = BitmapPainter(bitmap.asImageBitmap()),
+//                        contentDescription = ""
+//                    )
+//                    for (block in blocks.value!!.textBlocks){
+//                        val box = block.boundingBox
+//
+//                        val w = box!!.width()
+//                        val h = box.height()
+//                        val size = Size(w.toFloat(), h.toFloat())
+//                        val topLeft = Offset(box.left.toFloat(),box.top.toFloat())
+//
+//                        Box(modifier = mod.boundingBox(Color.Magenta, 5f, size, topLeft, block.text))
+//                    }
+//                }
+//            }
+//        }
+
+
+
+
+        //bitmap=cutInputImg(bitmap)
+
         val result = recognizer.process(img)
             .addOnSuccessListener { visionText ->
-                ProcessResult(context,visionText.textBlocks,{},bitmap)
+                blocks.value = visionText
+                ProcessResult(context,visionText.textBlocks,{product: String, price:Int ->},bitmap)
             }
     }
-    fun MakeOCR(ImagePath:String,context:Context,SuccesOCR: (Text:Text)-> Unit){
-        val recognizer = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS)
-        val file= File(ImagePath).exists()
-        if(file) {
-            Toast.makeText(context, "ITSSSSS ALIVEEEEE!!! Run for your life! ITS GONNA ORK YOU!!!", Toast.LENGTH_LONG).show()
-            val bitmap=makeBitmapFromPath(Uri.parse(ImagePath))
+    fun MakeOCR(ImagePath:String,context:Context,SuccesOCR: (product:String, price:Int) ->Unit,onFailure: (msg:String) -> Unit) {
+            val recognizer = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS)
+            val file = File(ImagePath).exists()
+            if (file) {
+                //Toast.makeText(context, "ITSSSSS ALIVEEEEE!!! Run for your life! ITS GONNA ORK YOU!!!", Toast.LENGTH_LONG) .show()
+                val bitmap = makeBitmapFromPath(Uri.parse(ImagePath))
 
-            val img = InputImage.fromBitmap(bitmap, 0)
-            val result = recognizer.process(img)
-                .addOnSuccessListener { visionText ->
-                    ProcessResult(context,visionText.textBlocks, SuccesOCR,bitmap)
-                }
-                .addOnFailureListener { e ->
-                    Toast.makeText(context, e.message, Toast.LENGTH_LONG).show()
-                }
-        }
+                val img = InputImage.fromBitmap(bitmap, 0)
+                val result = recognizer.process(img)
+                    .addOnSuccessListener { visionText ->
+                        try {
+                            ProcessResult(context, visionText.textBlocks, SuccesOCR, bitmap)
+                        }
+                        catch (err:Exception){
+                            onFailure.invoke(err.message.toString())
+                        }
+                    }
+                    .addOnFailureListener { e ->
+                        onFailure.invoke(e.message.toString())
+                    }
+            }
+
     }
 
 
@@ -129,12 +165,15 @@ class OCR()  {
                 blockDistancesByTop.add(abs(startPoint!!.lines[0]!!.boundingBox!!.top-b!!.lines[0]!!.boundingBox!!.top))
                 blockDistancesByBottom.add(abs(startPoint.lines[0].boundingBox!!.bottom-b!!.lines[0].boundingBox!!.bottom))
             }
-
+            else{
+                blockDistancesByTop.add(9999999)
+                blockDistancesByBottom.add(9999999)
+            }
         }
 
         //index of min distance top/bottom neighbor
         val minTopIndex=blockDistancesByTop.indexOf(blockDistancesByTop.min())
-        blockDistancesByBottom[minTopIndex]=10000000 //avoid choosing same element
+        blockDistancesByBottom[minTopIndex]=9999999 //avoid choosing same element
         val minBottomIndex=blockDistancesByBottom.indexOf(blockDistancesByBottom.min())
 
         val minTopText=allBlocks[minTopIndex].text
@@ -148,7 +187,6 @@ class OCR()  {
             }else{
                 Index=minTopIndex
             }
-
         }
         else{
             if(returnSmaller){
@@ -186,22 +224,28 @@ class OCR()  {
         context: Context,
         //dictanoty deetcted obj as key and text blocks as values
         blocks: MutableList<TextBlock>?,
-        SuccesOCR: (Text:Text)-> Unit,
-        bitmap: Bitmap){
+        SuccesOCR: (product:String, price:Int) -> Unit,
+        bitmap: Bitmap
+    ){
         //TODO: if ft+price in the same block cant be found search for price block close to ft
         var currentBlock:TextBlock? = null
         val currencyregex = Regex("(\\d+)\\D*FT")
         //price tag text blocks
-        var AllBlocks= mutableListOf<TextBlock>()  //first it will contain all blocks which are not currency related than it will be filtered to search for product
+        var AllBlocks:MutableList<TextBlock> = mutableListOf()  //first it will contain all blocks which are not currency related than it will be filtered to search for product
         //search for block that has currency in it rest will go to AllBlocks
-        var currency:Int=0
+        for(b in blocks!!){
+            AllBlocks.add(b)
+        }
+        var currency: Int? = null
         var isFT=false
         var ftBlock:TextBlock?=null //only used if FT+currency not in one block
-        if (blocks != null) {
-            for (b in blocks){
 
+        val biggestBoxByArea =blocks!!.maxBy { b: TextBlock -> (b.boundingBox!!.height())*b.boundingBox!!.width() }
+        currency = biggestBoxByArea.text.uppercase().replace("FT","").replace(" ","").replace(".","").toIntOrNull()
+
+        if(currency == null){
+            for (b in blocks){
                 val text=b.text.uppercase()
-                AllBlocks.add(b)
 
                 if(text.contains("FT") && !isFT){
                     isFT=true
@@ -216,22 +260,29 @@ class OCR()  {
                     AllBlocks.remove(b) //remove all currency blocks
                 }
             }
-        }
-        //if no blocks can be found with curreny+FT, search for them seperetly
-        if(currentBlock==null && isFT){
-            AllBlocks.remove(ftBlock)
 
-            AllBlocks=removeBlocksWidthDifferentAngle(AllBlocks,ftBlock!!)
+            //if no blocks can be found with curreny+FT, search for them seperetly
+            if(currentBlock==null && isFT){
+                AllBlocks.remove(ftBlock)
 
-            //currency should be close to FT block
-            val onlyNumberRegex=Regex("^\\d+\$")
-            val priceIndex=findBlockBasedOnDistance(onlyNumberRegex,AllBlocks,ftBlock!!,true)
-            currency=AllBlocks[priceIndex].text.replace("\n","").toInt()
-            currentBlock=AllBlocks[priceIndex]
+                AllBlocks=removeBlocksWidthDifferentAngle(AllBlocks,ftBlock!!)
+
+                //currency should be close to FT block
+                val onlyNumberRegex=Regex("^\\d+\$")
+                val priceIndex=findBlockBasedOnDistance(onlyNumberRegex,AllBlocks,ftBlock!!,true)
+                currency=AllBlocks[priceIndex].text.replace("\n","").toInt()
+                currentBlock=AllBlocks[priceIndex]
+                AllBlocks=removeBlocksWidthDifferentAngle(AllBlocks,currentBlock!!)
+            }
         }
         else{
+            currentBlock=biggestBoxByArea
             AllBlocks=removeBlocksWidthDifferentAngle(AllBlocks,currentBlock!!)
         }
+        if (currentBlock == null){
+            throw Exception("Price cannot be found! Please take a new picture!")
+        }
+        AllBlocks.remove(currentBlock)
 
         /*
         //TODO: separate barcode from other parts of the image
@@ -267,33 +318,47 @@ class OCR()  {
         */
 
 
-
-
-
         //remove blocks that have 3 letters or fewer
         val isGramInIt=Regex("\\d{2}\\s?g|\\d{2}\\s?G")
-        val threeCharactersOrMore=Regex(".*\\D{3}.*")
-        val NotThreeCharactersOrMore = Predicate<TextBlock> { b: TextBlock -> !threeCharactersOrMore.containsMatchIn(b.text.replace(" ","")) && !isGramInIt.containsMatchIn(b.text) }
-        remove(AllBlocks,NotThreeCharactersOrMore)
-
+        /* val NotThreeCharactersOrMore = Predicate<TextBlock> { b: TextBlock -> !threeCharactersOrMore.containsMatchIn(b.text.replace(" ","")) && !isGramInIt.containsMatchIn(b.text) }
+      remove(AllBlocks,NotThreeCharactersOrMore)*/
+        // TODO: discount filter regex???
         //lines that are closest in the img to the currency line, one of them is the title
-        val productTitleIndex=findBlockBasedOnDistance(Regex(".*"),AllBlocks,currentBlock!!,false)
+        val titleRegex = "[A-Z].*[a-zA-Z]{3}"
+        val productTitleIndex=findBlockBasedOnDistance(Regex("${titleRegex}"),AllBlocks,currentBlock!!,false)
         var productTitle=AllBlocks[productTitleIndex].text.replace("\n","")
 
 
         //if previous block have 3 characters atleast they are part of the title
-        // TODO: find better filter for this
         if(productTitleIndex-1>=0){
-            if(threeCharactersOrMore.containsMatchIn(AllBlocks[productTitleIndex-1].text)){
-                productTitle=productTitle+" "+AllBlocks[productTitleIndex-1].text.replace("\n","")
+            if(Regex("${titleRegex}").containsMatchIn(AllBlocks[productTitleIndex-1].text)){
+                productTitle=AllBlocks[productTitleIndex-1].text.replace("\n"," ")+" "+productTitle
+            }
+        }
+        if(productTitleIndex-2>=0){
+            if(Regex("${titleRegex}").containsMatchIn(AllBlocks[productTitleIndex-2].text)){
+                productTitle=AllBlocks[productTitleIndex-2].text.replace("\n"," ")+" "+productTitle
             }
         }
 
         //the xxxg text is the last part of title if it exists, so every block should be added to the title until gram can be found
         productTitle=findProductNameEnd(productTitle,productTitleIndex,AllBlocks,isGramInIt)
 
-        Toast.makeText(context,productTitle,Toast.LENGTH_LONG).show()
+        //remove diveder part
+        if ("|" in productTitle) {
+            productTitle = productTitle.split("|")[1]
+            if (productTitle[0] == ' ') {
+                productTitle = productTitle.substring(1, productTitle.length)
+            }
+        }
 
+        //
+        if("- " in productTitle || " -" in productTitle){
+            productTitle=productTitle.replace("- ","-").replace(" -","-")
+        }
+
+        //Toast.makeText(context,productTitle,Toast.LENGTH_LONG).show()
+        SuccesOCR.invoke(productTitle,currency!!)
         //line that has similar text to product img text
         //TODO: is good idea?
 

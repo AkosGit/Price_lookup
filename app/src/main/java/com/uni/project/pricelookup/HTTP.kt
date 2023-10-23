@@ -99,8 +99,11 @@ class HTTP(
                 when (result) {
                     is Result.Success -> {
 
-                        if(productImagePath!=null){
+                        if(productImagePath!=null && productImagePath!=""){
                             sendImage(productImagePath,result.value.itemId,onSuccess,onFailure,onNetworkError)
+                        }
+                        else{
+                            onSuccess.invoke(result.value.itemId)
                         }
                     }
                     is Result.Failure -> {

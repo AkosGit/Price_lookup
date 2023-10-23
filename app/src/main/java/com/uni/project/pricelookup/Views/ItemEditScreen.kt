@@ -1,7 +1,6 @@
 package com.uni.project.pricelookup.Views
 
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
+import android.content.Context
 import android.widget.Toast
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
@@ -41,16 +40,35 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import com.google.mlkit.vision.text.Text
 import com.uni.project.pricelookup.HTTP
+import com.uni.project.pricelookup.ML.OCR
 import com.uni.project.pricelookup.R
 import com.uni.project.pricelookup.components.NetworkError
 import com.uni.project.pricelookup.models.SearchResult
 import kotlin.io.encoding.Base64
 
+fun ocrWasDone(detectedName: String): Boolean{
+    return if (detectedName != "") true
+    else{
+        false
+    }
+}
+fun canUpload(detectedName: String, detectedPrice: Int): Boolean{
+    return if (detectedName != "" && detectedPrice != 0) true
+    else{
+        false
+    }
+}
+
+fun doOcrMagicStuff(photoBarCode: String , context: Context , SuccesOCR: (product:String, price:Int)-> Unit,onFailure: (msg:String) -> Unit){
+    val ocr= OCR()
+    ocr.MakeOCR(photoBarCode, context, SuccesOCR, onFailure)
+}
+
+
 @OptIn(ExperimentalComposeUiApi::class, ExperimentalMaterialApi::class, ExperimentalMaterial3Api::class,
     DelicateCoroutinesApi::class, ExperimentalSheetApi::class, ExperimentalFoundationApi::class
 )
 @Composable
-//TODO: item upload indicator + jump to homepage
 fun ItemEditScreen(navigation: NavController) {
     val isLoaded = remember {
         mutableStateOf(false)
@@ -71,6 +89,7 @@ fun ItemEditScreen(navigation: NavController) {
     var detectedPrice= remember {
         mutableStateOf(0)
     }
+
 
     //getting barcode photo
     val context = LocalContext.current
@@ -240,6 +259,8 @@ fun ItemEditScreen(navigation: NavController) {
 
 
         //Buttons
+
+        // TODO - icon méretezgetés
         Box(
             contentAlignment = Alignment.BottomCenter,
             modifier = Modifier.fillMaxSize()
@@ -253,9 +274,24 @@ fun ItemEditScreen(navigation: NavController) {
             ){
                 ElevatedButton(
                     onClick = {
-                        //val ocr=OCR()
-                        //ocr.MakeOCR(photoBarCode,context,{text-> })
-                        //HTTP().sendImage(photoBarCode)
+                        doOcrMagicStuff(
+                            photoBarCode,
+                            context,{
+                                product: String,
+                                price: Int ->
+                                    detectedName.value = product
+                                    detectedPrice.value = price
+                            },{
+                                msg:String ->
+                                   if(msg== "Price cannot be found! Please take a new picture!"){
+                                        //TODO: counter to not enable field editting before number of tries has been reached
+                                        Toast.makeText(context,"u fcked up m8! Gimme new pikcsáh",Toast.LENGTH_LONG).show()
+                                    }else {
+                                        Toast.makeText(context, "Something died, and you are next :)", Toast.LENGTH_LONG).show()
+                                    }
+                                    detectedName.value = "edit me"
+                            }
+                        )
                     },
                     colors = ButtonColors(
                         containerColor = MaterialTheme.colorScheme.primary,
@@ -268,12 +304,11 @@ fun ItemEditScreen(navigation: NavController) {
                         .size(70.dp)
                     ,
                     content = {
-//                        Text(text = "Process Barcode")
                         androidx.compose.material.Icon(
                             Icons.Rounded.DocumentScanner,
-                            contentDescription = "AddTask Icon",
+                            contentDescription = "Scann data from pricetag",
                             tint = MaterialTheme.colorScheme.onPrimary,
-                            modifier = Modifier.fillMaxSize()
+                            modifier = Modifier.fillMaxSize(),
                         )
                     }
                 )
@@ -290,7 +325,6 @@ fun ItemEditScreen(navigation: NavController) {
                         .size(70.dp)
                     ,
                     content = {
-//                        Text(text = "Edit data")
                         androidx.compose.material.Icon(
                             Icons.Rounded.EditAttributes,
                             contentDescription = "AddTask Icon",
@@ -300,6 +334,7 @@ fun ItemEditScreen(navigation: NavController) {
                     }
                 )
                 ElevatedButton(
+                    enabled = canUpload(detectedName.value, detectedPrice.value),
                     onClick = {
                         CoroutineScope(Dispatchers.IO).launch {
                             client.updateProduct(detectedName.value,shop.value,detectedPrice.value,photoProduct.value, {
@@ -333,7 +368,7 @@ fun ItemEditScreen(navigation: NavController) {
                             Icons.Rounded.CloudUpload,
                             contentDescription = "AddTask Icon",
                             tint = MaterialTheme.colorScheme.onPrimary,
-                            modifier = Modifier.fillMaxSize()
+                            modifier = Modifier.fillMaxSize(),
                         )
                     }
                 )
