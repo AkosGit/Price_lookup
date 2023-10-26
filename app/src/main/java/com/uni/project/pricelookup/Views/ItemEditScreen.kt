@@ -41,6 +41,9 @@ import com.uni.project.pricelookup.ML.OCR
 import com.uni.project.pricelookup.R
 import com.uni.project.pricelookup.components.NetworkError
 
+// TODO
+//  - product picture után megint elvárja az OCR-t
+
 fun ocrWasDone(detectedName: String): Boolean{
     return if (detectedName != "") true
     else{
