@@ -71,7 +71,7 @@ fun MainPage(navigation: NavController) {
             )
         ){
             Text(
-                text = "Products that might be of interest",
+                text = "Lastly updated products:",
                 style = MaterialTheme.typography.titleMedium,
                 modifier = Modifier
                     .padding(start = 6.dp, top = 10.dp, end = 6.dp),

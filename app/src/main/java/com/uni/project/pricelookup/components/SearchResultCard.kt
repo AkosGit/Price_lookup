@@ -1,6 +1,7 @@
 package com.uni.project.pricelookup.components
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -10,6 +11,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -34,7 +36,9 @@ fun SearchResultCard(
             containerColor = MaterialTheme.colorScheme.surfaceVariant,
         ),
         modifier = Modifier
-            .padding(12.dp, 5.dp),
+            .padding(12.dp, 5.dp)
+            .height(130.dp)
+        ,
         shape = RoundedCornerShape(
             topStart = 30.dp,
             topEnd = 0.dp,
@@ -68,22 +72,27 @@ fun SearchResultCard(
                     }
                 }
                 else {
-                    AsyncImage(
-                        model = imageModel,
-                        contentDescription = null,
-                        alignment = Alignment.CenterStart,
+                    Box(
+                        contentAlignment = Alignment.CenterStart,
                         modifier = Modifier
+                            .fillMaxHeight()
                             .width(200.dp)
-                            .height(130.dp)
-                            .clip(
-                                shape = RoundedCornerShape(
-                                    topStart = 0.dp,
-                                    topEnd = 30.dp,
-                                    bottomEnd = 30.dp,
-                                    bottomStart = 30.dp
-                                )
-                            ),
-                    )
+                    ){
+                        AsyncImage(
+                            model = imageModel,
+                            contentDescription = null,
+                            contentScale = ContentScale.Crop,
+                            modifier = Modifier
+                                .clip(
+                                    shape = RoundedCornerShape(
+                                        topStart = 0.dp,
+//                                        topEnd = 30.dp,
+//                                        bottomEnd = 30.dp,
+                                    )
+                                ),
+                        )
+                    }
+
                 }
 
                 Column(
@@ -91,11 +100,10 @@ fun SearchResultCard(
                     horizontalAlignment = Alignment.CenterHorizontally,
 
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .height(130.dp)
+                        .fillMaxSize()
                 ) {
                     Text(
-                        text = productName,
+                        text = sliceProdName(productName),
                     )
                     Text(
                         text = "Minimális ár: $productMinPrice",
@@ -134,16 +142,23 @@ fun SearchResultCard(
     )
 }
 
-
-
-@Preview
-@Composable
-fun SearchResultCardPreview(){
-    SearchResultCard(
-        imageModel = R.drawable.chocolate_bar1,
-        productName = "Twix csoki",
-        productMinPrice =100,
-        navigation = null,
-        ItemId = 0
-    )
+fun sliceProdName(input: String): String{
+    if (input.length >= 20){
+        return input.slice(0..15) + "..."
+    }else{
+        return input
+    }
 }
+
+
+//@Preview
+//@Composable
+//fun SearchResultCardPreview(){
+//    SearchResultCard(
+//        imageModel = R.drawable.chocolate_bar1,
+//        productName = "Twix csoki",
+//        productMinPrice =100,
+//        navigation = null,
+//        ItemId = 0
+//    )
+//}
