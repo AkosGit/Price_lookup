@@ -22,6 +22,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.draw.scale
@@ -37,7 +38,13 @@ fun SearchWidget(
     onCloseClicked: () -> Unit,
 ) {
     val keyboardController = LocalSoftwareKeyboardController.current
-
+    val isKeyboardHiddden = remember {
+        mutableStateOf(false)
+    }
+    if(isKeyboardHiddden.value){
+        LocalSoftwareKeyboardController.current!!.hide()
+        isKeyboardHiddden.value=false
+    }
     //ez van a search widget 'mögött/körül' -> amin rajta van
     Surface(
         modifier = Modifier
@@ -94,7 +101,11 @@ fun SearchWidget(
                     IconButton(
                         modifier = Modifier
                             .alpha(alpha = DefaultAlpha),
-                        onClick = { onSearchClicked(text) }
+                        onClick = {
+                            isKeyboardHiddden.value=true
+                            onSearchClicked(text)
+
+                        }
                     ) {
                         Icon(
                             imageVector = Icons.Default.Search,
@@ -131,6 +142,7 @@ fun SearchWidget(
                 ),
                 keyboardActions = KeyboardActions(
                     onSearch = {
+                        isKeyboardHiddden.value=true
                         onSearchClicked(text)
                     }
                 ),

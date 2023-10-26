@@ -193,7 +193,7 @@ class MainActivity : ComponentActivity() {
 //                                    scrolledContainerColor = MaterialTheme.colorScheme.primaryContainer
                                             ),
                                             title = {
-                                                Text("Price checker")
+                                                Text("Price Link")
                                             },
                                             navigationIcon = {
                                                 IconButton(onClick = {

@@ -307,6 +307,7 @@ fun ItemEditScreen(navigation: NavController) {
                         )
                     }
                 )
+
                 ElevatedButton(
                     enabled = ocrWasDone(detectedName.value),
                     onClick = { visible.value = true },
